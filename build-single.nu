@@ -28,14 +28,6 @@ const WORKER_CHAIN = [
     js/spectre/spectre-worker.js
 ]
 
-# all.min.css declares every Font Awesome style; the page uses duotone and
-# solid only, and the other five fonts would add a megabyte to the file.
-const FONTAWESOME_STYLES = [
-    plugins/fontawesome/css/fontawesome.min.css
-    plugins/fontawesome/css/duotone.min.css
-    plugins/fontawesome/css/solid.min.css
-]
-
 def source-path [relative: string]: nothing -> string {
     $ROOT | path join $relative | path expand
 }
@@ -112,9 +104,7 @@ def inline-stylesheets []: string -> string {
     $html
     | parse --regex r#'(?<tag><link rel="stylesheet" href="(?<href>[^"]+)"[^>]*>)'#
     | reduce --fold $html {|link, acc|
-        let files = if $link.href == "plugins/fontawesome/css/all.min.css" { $FONTAWESOME_STYLES } else { [$link.href] }
-        let css = $files | each {|file| inline-css $file } | str join "\n"
-        $acc | must-replace $link.tag $"<style>($css)</style>"
+        $acc | must-replace $link.tag $"<style>(inline-css $link.href)</style>"
     }
 }
 

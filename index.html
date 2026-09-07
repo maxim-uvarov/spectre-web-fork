@@ -24,7 +24,8 @@
         <meta name="apple-mobile-web-app-title" content="Spectre">
         <meta name="apple-mobile-web-app-status-bar-style" content="default">
         <link rel="stylesheet" href="plugins/bootstrap/bootstrap.min.css">
-        <link rel="stylesheet" href="plugins/fontawesome/css/all.min.css">
+        <link rel="stylesheet" href="plugins/fontawesome/css/fontawesome.min.css">
+        <link rel="stylesheet" href="plugins/fontawesome/css/solid.min.css">
         <link rel="stylesheet" href="css/spectre-base.css" media="screen">
         <link rel="stylesheet" href="css/spectre-web.css" media="screen">
         <script defer src="plugins/jquery/jquery.min.js"></script>
@@ -43,13 +44,13 @@
             <div id="user" class="container" data-active="true">
                 <div class="row justify-content-center">
                     <div class="col-lg-6 text-center box">
-                        <i class="fa-duotone fa-user-circle"></i>
+                        <i class="fa-solid fa-user-circle"></i>
                         <hr>
 
                         <form>
                             <p>
                                 <label id="userName">
-                                    <i class="fa-duotone fa-fw fa-user-large"></i>
+                                    <i class="fa-solid fa-fw fa-user-large"></i>
                                     Your Full Name
                                     <input type="text" placeholder="eg. Robert Lee Mitchell" autocomplete="username">
                                 </label>
@@ -57,16 +58,16 @@
 
                             <p>
                                 <label id="userSecret">
-                                    <i class="fa-duotone fa-fw fa-user-lock"></i>
+                                    <i class="fa-solid fa-fw fa-user-lock"></i>
                                     Your Spectre Secret
-                                    <i class="fa-duotone fa-fw fa-galaxy fa-spin"></i>
+                                    <i class="fa-solid fa-fw fa-spinner fa-spin"></i>
                                     <input type="password" placeholder="eg. banana colored duckling" autocomplete="current-password">
                                 </label>
                             </p>
 
                             <p>
                                 <label id="algorithmVersion">
-                                    <i class="fa-duotone fa-fw fa-rectangle-vertical-history"></i>
+                                    <i class="fa-solid fa-fw fa-clock-rotate-left"></i>
                                     Algorithm Version
                                     <select>
                                         <option value="0">V0 (2012:03)</option>
@@ -84,7 +85,7 @@
     
                             <p>
                                 <button type="submit" id="signin">
-                                    <i class="fa-duotone fa-fw fa-2x fa-right-to-bracket"></i><br>
+                                    <i class="fa-solid fa-fw fa-2x fa-right-to-bracket"></i><br>
                                     Sign In
                                 </button>
                             </p>
@@ -98,13 +99,13 @@
             <div id="site" class="container" data-active="false">
                 <div class="row justify-content-center">
                     <div class="col-lg-6 text-center box">
-                        <i class="fa-duotone fa-globe"></i>
+                        <i class="fa-solid fa-globe"></i>
                         <hr>
 
                         <form>
                             <p>
                                 <label id="siteName">
-                                    <i class="fa-duotone fa-fw fa-globe"></i>
+                                    <i class="fa-solid fa-fw fa-globe"></i>
                                     Password Name or Site Domain
                                     <input type="text" placeholder="eg. twitter.com">
                                 </label>
@@ -114,7 +115,7 @@
                                 <div class="col-lg-6">
                                     <p>
                                         <label id="siteCounter">
-                                            <i class="fa-duotone fa-fw fa-rectangle-vertical-history"></i>
+                                            <i class="fa-solid fa-fw fa-clock-rotate-left"></i>
                                             Password Number
                                             <input type="number" placeholder="1" min="1" max="100" value="1" class="half" />
                                         </label>
@@ -124,7 +125,7 @@
                                 <div class="col-lg-6">
                                     <p>
                                         <label id="siteType">
-                                            <i class="fa-duotone fa-fw fa-key"></i>
+                                            <i class="fa-solid fa-fw fa-key"></i>
                                             Password Type
                                             <select></select>
                                         </label>
@@ -145,9 +146,9 @@
         
                             <p>
                                 <label id="siteResult">
-                                    <i class="fa-duotone fa-fw glyph-spectre"></i>
+                                    <i class="fa-solid fa-fw glyph-spectre"></i>
                                     Result
-                                    <i class="fa-duotone fa-fw fa-galaxy fa-spin"></i>
+                                    <i class="fa-solid fa-fw fa-spinner fa-spin"></i>
                                     <button type="submit" class="fa-solid fa-copy">
                                         <input class="code" value="PozoLalv0_Yelo" readonly="">
                                     </button>
@@ -162,7 +163,7 @@
 
                         <p>
                             <button type="submit" id="signout">
-                                <i class="fa-duotone fa-fw fa-2x fa-right-from-bracket"></i><br>
+                                <i class="fa-solid fa-fw fa-2x fa-right-from-bracket"></i><br>
                                 Sign Out
                             </button>
                         </p>

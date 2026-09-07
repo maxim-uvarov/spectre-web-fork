@@ -61,7 +61,7 @@ h1:target::before, h2:target::before, h3:target::before, h4:target::before, h5:t
     align-items: center;
     height: 100%;
     margin-left: -1.5em;
-    font-family: "Font Awesome 6 Pro", monospace;
+    font-family: "Font Awesome 6 Free", monospace;
     color: var(--active-text);
 }
 
