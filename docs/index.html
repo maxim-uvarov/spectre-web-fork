@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nNY5pTA1/n43DKERnIpzB9Lq5fWnikcb4o1p2KAKTDE=' 'sha256-54tOrQ9eaV5i9IfKEvcdxaBN4y/f55a2cKvic/j491E=' 'sha256-0zNke5rv5J5iZ4mqvu0phIrAnCh9meE2wrcQXjPs7OA='; style-src 'sha256-Ytll+QSQJb4cHSHIPFGmdUnC+TB333Kov68xlhds5K4='; img-src data:; font-src data:; worker-src 'self' blob:; manifest-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nNY5pTA1/n43DKERnIpzB9Lq5fWnikcb4o1p2KAKTDE=' 'sha256-54tOrQ9eaV5i9IfKEvcdxaBN4y/f55a2cKvic/j491E=' 'sha256-212kOGZt4643PHjQUcsQZXVfkduI3YOBGhIeD/y3lWA='; style-src 'sha256-Ytll+QSQJb4cHSHIPFGmdUnC+TB333Kov68xlhds5K4='; img-src data:; font-src data:; worker-src 'self' blob:; manifest-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
         <title>Spectre Web fork</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
         <meta name="theme-color" content="#3E8989">
@@ -689,7 +689,9 @@ signOutButton.addEventListener("click", () => {
 document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
         siteResult.value = "";
-    } else {
+    } else if (spectre.operations.user.authenticated) {
+        // Not an unconditional updateView because: signed out, it resets the
+        // sign-in fields, and a screen lock mid-typing would erase the secret.
         updateView();
     }
 });
