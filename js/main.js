@@ -10,6 +10,7 @@ const siteCounter = document.getElementById("siteCounter");
 const siteType = document.getElementById("siteType");
 const siteResult = document.getElementById("siteResult");
 const siteError = document.getElementById("siteError");
+const seedNotice = document.getElementById("seedNotice");
 const copyButton = document.getElementById("copy");
 const signOutButton = document.getElementById("signout");
 
@@ -64,6 +65,7 @@ function updateView() {
 
     if (signedIn) {
         identity.textContent = `${user.userName} ${identicon(user.identicon)}`;
+        seedNotice.hidden = siteType.value != spectre.resultType.deriveMnemonic;
         siteResult.value = spectre.result(siteName.value, purpose(), null, siteType.value, siteCounter.value) || (site.pending ? "…" : "");
     } else {
         userName.value = user.userName || "";
