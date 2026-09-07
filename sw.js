@@ -23,6 +23,7 @@ const PRECACHE = [
     "js/spectre/spectre-worker.js",
     "js/spectre/spectre-algorithm.js",
     "js/spectre/scrypt.js",
+    "js/spectre/pbkdf2.js",
     "images/spectre.png",
     "images/spectre-light.png",
     "images/spectre-light-glyph.svg",
