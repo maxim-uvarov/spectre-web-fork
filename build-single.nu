@@ -102,9 +102,9 @@ def inline-manifest []: nothing -> string {
 def inline-stylesheets []: string -> string {
     let html = $in
     $html
-    | parse --regex r#'(?<tag><link rel="stylesheet" href="(?<href>[^"]+)"[^>]*>)'#
+    | parse --regex r#'(?<tag><link rel="stylesheet" href="(?<href>[^"]+)"(?<attributes>[^>]*)>)'#
     | reduce --fold $html {|link, acc|
-        $acc | must-replace $link.tag $"<style>(inline-css $link.href)</style>"
+        $acc | must-replace $link.tag $"<style($link.attributes)>(inline-css $link.href)</style>"
     }
 }
 
@@ -127,7 +127,7 @@ def hashed-csp []: string -> string {
         $html | parse --regex $pattern | get body | each {|body| $"'sha256-($body | sha256-base64)'" } | str join ' '
     }
     let scripts = do $hashes '(?s)<script>(?<body>.*?)</script>'
-    let styles = do $hashes '(?s)<style>(?<body>.*?)</style>'
+    let styles = do $hashes '(?s)<style[^>]*>(?<body>.*?)</style>'
     $html | must-replace --regex '<meta http-equiv="Content-Security-Policy" content="[^"]*">' $"<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src ($scripts); style-src ($styles); img-src data:; font-src data:; worker-src 'self' blob:; manifest-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'\">"
 }
 
