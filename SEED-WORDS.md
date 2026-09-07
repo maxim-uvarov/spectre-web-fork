@@ -7,7 +7,7 @@ Once one real wallet uses it, any change to it, however small, is a wallet-loss 
 ## Inputs
 
 - Full name and Spectre secret, as typed on the sign-in form.
-- Algorithm version. It only matters when the name or the site holds non-ASCII characters: V0-V2 count the name in characters, V3 in bytes.
+- Algorithm version. It only matters when the name or the site holds non-ASCII characters: V0-V2 count the name in characters and V0-V1 count the site in characters; V3 counts both in bytes.
 - Site and counter.
 
 The purpose radio (Password, Login name, Security answer) has no effect.
@@ -25,7 +25,9 @@ A wallet seed has no rate limit and no reset, and the chain is public, so the se
     words     = BIP-39(entropy)                            # 256 bits + 8 checksum bits, 24 words, English list
 
 All strings are UTF-8.
-`len` is the byte length under V3 and the character length under V0-V2.
+`len(name)` is the byte length under V3 and the character length under V0-V2.
+`len(site)` is the byte length under V2-V3 and the character length under V0-V1.
+The reference implementation below is V3 only.
 The BIP-39 English list is the upstream one, unchanged (sha256 `2f5eed53a4727b4bf8880d8f3f199efc90e58503646d9ff8eff3a2ed3b24dbda`).
 
 ## Test vector
