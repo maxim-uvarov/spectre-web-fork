@@ -22,7 +22,10 @@ const PRECACHE = [
 ];
 
 self.addEventListener("install", event => {
-    event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(PRECACHE)).then(() => self.skipWaiting()));
+    // Why: addAll goes through the HTTP cache, and GitHub Pages sends max-age=600;
+    // a new worker could precache the previous deploy and then serve it forever.
+    const fresh = PRECACHE.map(url => new Request(url, {cache: "reload"}));
+    event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(fresh)).then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", event => {
