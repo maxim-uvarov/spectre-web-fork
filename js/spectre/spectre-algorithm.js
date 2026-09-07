@@ -228,7 +228,7 @@ spectre.newIdenticon = Object.freeze(async(userName, userSecret) => {
     let key = await crypto.subtle.importKey("raw", spectre.encoder.encode(userSecret), {
         name: "HMAC", hash: {name: "SHA-256"}
     }, false, ["sign"])
-    let seed = await crypto.subtle.sign("HMAC", key, spectre.encoder.encode(userName))
+    let seed = new Uint8Array(await crypto.subtle.sign("HMAC", key, spectre.encoder.encode(userName)))
 
     return {
         "leftArm": spectre.identicons.leftArm[seed[0] % spectre.identicons.leftArm.length],
