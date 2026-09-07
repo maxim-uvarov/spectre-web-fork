@@ -126,7 +126,7 @@ function mergeInto(host, ...objects) {
 
 spectre.worker = newWorkerFromURL("js/spectre/spectre-worker.js");
 spectre.worker.onmessage = (msg) => {
-    console.trace(`[spectre]: onmessage: ${JSON.stringify(msg.data)})`);
+    console.trace(`[spectre]: onmessage: ${msg.data.operation}`);
     if (msg.data.userName !== spectre.operations.user.userName)
         return;
 
