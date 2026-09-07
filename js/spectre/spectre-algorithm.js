@@ -197,18 +197,23 @@ spectre.newSiteResult = Object.freeze(async(userKey, siteName,
     keyPurpose = spectre.purpose.authentication, keyContext = null) => {
     console.trace(`[spectre]: result: ${siteName} (resultType=${resultType}, keyCounter=${keyCounter}, keyPurpose=${keyPurpose}, keyContext=${keyContext})`);
 
-    let siteKey = await spectre.newSiteKey(userKey, siteName, keyCounter, keyPurpose, keyContext)
-    let siteKeyBytes = siteKey.keyData
-
-    // The site key is 32 bytes of HMAC output, exactly the entropy of a 24-word
-    // mnemonic, so the seed follows from name, secret, site and counter alone.
+    // The seed words take a site key of their own: the purpose is fixed and the
+    // context dropped, so the seed follows from name, secret, algorithm version,
+    // site and counter, and shares no bytes with any password of the same site.
     // Why: a wallet seed has no rate limit and no reset, the chain is public, so
     // the master secret behind it must be long and random; the user accepted that.
+    // Not the form's purpose because: the radio would silently become a wallet
+    // input, and a leaked password of the site would reveal bytes of the seed.
     // Not the V0 byte quirk below because: that exists for template indexing only.
     // The result type arrives as a string from the form, hence the loose ==.
+    // Frozen: once a real seed exists, any change here loses wallets. SEED-WORDS.md.
     if (resultType == spectre.resultType.deriveMnemonic) {
-        return spectre.newMnemonic(siteKeyBytes);
+        let seedKey = await spectre.newSiteKey(userKey, siteName, keyCounter, spectre.purpose.seed, null)
+        return spectre.newMnemonic(seedKey.keyData);
     }
+
+    let siteKey = await spectre.newSiteKey(userKey, siteName, keyCounter, keyPurpose, keyContext)
+    let siteKeyBytes = siteKey.keyData
 
     let resultTemplates = spectre.templates[resultType]
     if (!resultTemplates) {
