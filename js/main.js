@@ -109,12 +109,12 @@ $(() => {
     siteForm.on('submit', (e) => {
         e.preventDefault()
         siteResultInput.select()
-        if (navigator.clipboard.writeText(siteResultInput[0].value) || document.execCommand('copy')) {
+        navigator.clipboard.writeText(siteResultInput[0].value).then(() => {
             siteResultButton.attr("title", "Copied!").tooltip("_fixTitle").tooltip("show");
             setTimeout(() => {
                 siteResultButton.tooltip("hide").attr("title", "Copy Password").tooltip("_fixTitle");
             }, 1000);
-        }
+        });
     });
 
     signOutButton.on('click', () => {
