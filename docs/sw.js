@@ -2,13 +2,16 @@
 // Why: the page describes itself as an offline password cipher, and a home screen
 // install is only worth having if it opens without a network.
 
-const CACHE = "spectre-web-single-75de66e44747532a";
+const CACHE = "spectre-web-single-35c64b760ed3d941";
 
 // Everything index.html loads from this origin, plus the worker chain.
 const PRECACHE = ["./", "index.html", "sw.js"];
 
 self.addEventListener("install", event => {
-    event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(PRECACHE)).then(() => self.skipWaiting()));
+    // Why: addAll goes through the HTTP cache, and GitHub Pages sends max-age=600;
+    // a new worker could precache the previous deploy and then serve it forever.
+    const fresh = PRECACHE.map(url => new Request(url, {cache: "reload"}));
+    event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(fresh)).then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", event => {
