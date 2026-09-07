@@ -64,7 +64,7 @@ function updateView() {
 
     if (signedIn) {
         identity.textContent = `${user.userName} ${identicon(user.identicon)}`;
-        siteResult.value = spectre.result(siteName.value, purpose()) || (site.pending ? "…" : "");
+        siteResult.value = spectre.result(siteName.value, purpose(), null, siteType.value, siteCounter.value) || (site.pending ? "…" : "");
     } else {
         userName.value = user.userName || "";
         siteName.value = "";

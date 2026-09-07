@@ -90,8 +90,12 @@ spectre.request = Object.freeze((siteName, resultType, keyCounter, keyPurpose, k
         "keyContext": keyContext,
     });
 });
-spectre.result = Object.freeze((siteName, keyPurpose = spectre.purpose.authentication, keyContext = null) => {
-    return ((spectre.operations.site.result[siteName || ""] || {})[keyPurpose || ""] || {})[keyContext || ""]
+// Keyed by every input of the derivation. Why: keyed by site alone, a switch
+// of type or counter showed the previous result until the worker answered,
+// and Copy could grab a seed phrase while the select already said "Long".
+spectre.result = Object.freeze((siteName, keyPurpose = spectre.purpose.authentication, keyContext = null,
+                                resultType = "", keyCounter = spectre.counter.default) => {
+    return ((((spectre.operations.site.result[siteName || ""] || {})[keyPurpose || ""] || {})[keyContext || ""] || {})[resultType || ""] || {})[keyCounter || spectre.counter.default]
 });
 
 function newWorkerFromURL(workerURL) {
@@ -159,7 +163,11 @@ spectre.worker.onmessage = (msg) => {
             mergeInto(spectre.operations.site.result, {
                 [msg.data.siteName || ""]: {
                     [msg.data.keyPurpose || ""]: {
-                        [msg.data.keyContext || ""]: msg.data.siteResult
+                        [msg.data.keyContext || ""]: {
+                            [msg.data.resultType || ""]: {
+                                [msg.data.keyCounter || spectre.counter.default]: msg.data.siteResult
+                            }
+                        }
                     }
                 }
             });
