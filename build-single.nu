@@ -94,7 +94,7 @@ def inline-service []: nothing -> string {
 def inline-manifest []: nothing -> string {
     let json = read-text manifest.webmanifest
         | from json
-        | update icons [{src: (data-uri images/spectre.svg), sizes: any, type: image/svg+xml}]
+        | update icons [{src: (data-uri images/icon.svg), sizes: any, type: image/svg+xml}]
         | to json --raw
     $"data:application/manifest+json;base64,($json | encode base64)"
 }
@@ -135,10 +135,9 @@ def build-html []: nothing -> string {
     read-text index.html
     | inline-stylesheets
     | inline-scripts
-    | must-replace '<link rel="icon" href="images/spectre.png">' $'<link rel="icon" href="(data-uri images/spectre.svg)">'
-    | must-replace '<link rel="apple-touch-icon" href="images/spectre.png">' $'<link rel="apple-touch-icon" href="(data-uri images/spectre.png)">'
+    | must-replace '<link rel="icon" href="images/icon.svg">' $'<link rel="icon" href="(data-uri images/icon.svg)">'
+    | must-replace '<link rel="apple-touch-icon" href="images/icon.png">' $'<link rel="apple-touch-icon" href="(data-uri images/icon.png)">'
     | must-replace '<link rel="manifest" href="manifest.webmanifest">' $'<link rel="manifest" href="(inline-manifest)">'
-    | must-replace '<img src="images/spectre-light.png"' $'<img src="(data-uri images/spectre-light.png)"'
     | hashed-csp
 }
 

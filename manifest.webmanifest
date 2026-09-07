@@ -1,6 +1,6 @@
 {
-    "name": "Spectre Web",
-    "short_name": "Spectre",
+    "name": "Spectre Web fork",
+    "short_name": "Spectre fork",
     "description": "Password manager and secure identity platform. Spectre is a free and offline password cipher.",
     "start_url": "./",
     "scope": "./",
@@ -8,6 +8,6 @@
     "theme_color": "#3E8989",
     "background_color": "#0E3345",
     "icons": [
-        { "src": "images/spectre.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any" }
+        { "src": "images/icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
     ]
 }
