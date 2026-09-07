@@ -3,8 +3,6 @@
 International License. To view a copy of this license, visit
 http://creativecommons.org/licenses/by/4.0/ or see NOTICE.md. */
 
-// import { pbkdf2 } from 'js/mpw-js/pbkdf2';
-// importScripts("file:///Users/lhunath/workspace/lyndir/Spectre/web/js/spectre/pbkdf2.js");
 importScripts(new URL("js/spectre/pbkdf2.js", baseURI).href);
 
 // This is the scrypt function

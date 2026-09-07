@@ -22,8 +22,6 @@
  * `newUserKey`, `newSiteKey`, `newSiteResult` & `newIdenticon`: They are used to perform stateless Spectre algorithm operations.
  */
 
-// import { scrypt } from 'js/mpw-js/scrypt';
-// importScripts("file:///Users/lhunath/workspace/lyndir/Spectre/web/js/spectre/.js");
 importScripts(new URL("js/spectre/spectre-types.js", baseURI).href);
 importScripts(new URL("js/spectre/scrypt.js", baseURI).href);
 
