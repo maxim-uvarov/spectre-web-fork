@@ -110,7 +110,11 @@ output {
     min-height: 3rem;
     font-family: ui-monospace, monospace;
     font-size: 22px;
-    word-break: break-all;
+    /* Break only at spaces, and inside a token only when it has none: a
+       password has no spaces and must not overflow, but a seed word split
+       across lines gets copied to paper as two words. */
+    word-break: normal;
+    overflow-wrap: anywhere;
     user-select: all;
 }
 
