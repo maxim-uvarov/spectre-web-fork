@@ -1,0 +1,13 @@
+{
+    "name": "Spectre Web",
+    "short_name": "Spectre",
+    "description": "Password manager and secure identity platform. Spectre is a free and offline password cipher.",
+    "start_url": "./",
+    "scope": "./",
+    "display": "standalone",
+    "theme_color": "#3E8989",
+    "background_color": "#0E3345",
+    "icons": [
+        { "src": "images/spectre.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any" }
+    ]
+}
