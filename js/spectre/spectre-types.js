@@ -92,6 +92,9 @@ spectre.resultType = {
 
     /** 4160: Derive a unique binary key. */
     deriveKey: 0x0 | spectre.class.derive | spectre.feature.alternate,
+
+    /** 4161: Derive a 24-word BIP-39 mnemonic. Fork-local: no other Spectre client knows this value. */
+    deriveMnemonic: 0x1 | spectre.class.derive | spectre.feature.alternate,
 };
 spectre.resultType = Object.freeze({
     ...spectre.resultType,
@@ -111,6 +114,7 @@ spectre.resultName = Object.freeze({
     [spectre.resultType.statePersonal]: "Own",
     [spectre.resultType.stateDevice]: "Device",
     [spectre.resultType.deriveKey]: "Key",
+    [spectre.resultType.deriveMnemonic]: "Seed words",
 });
 spectre.counter = {
     /** Use a time-based counter value, resulting in a TOTP generator. */

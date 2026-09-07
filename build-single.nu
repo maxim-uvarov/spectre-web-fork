@@ -24,6 +24,7 @@ const WORKER_CHAIN = [
     js/spectre/pbkdf2.js
     js/spectre/spectre-types.js
     js/spectre/scrypt.js
+    js/spectre/bip39.js
     js/spectre/spectre-algorithm.js
     js/spectre/spectre-worker.js
 ]

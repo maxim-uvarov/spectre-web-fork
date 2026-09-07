@@ -19,6 +19,7 @@ for (let version = spectre.algorithm.first; version <= spectre.algorithm.last; v
 for (const template in spectre.templates) {
     siteType.add(new Option(spectre.resultName[template], template));
 }
+siteType.add(new Option(spectre.resultName[spectre.resultType.deriveMnemonic], spectre.resultType.deriveMnemonic));
 
 function purpose() {
     return siteForm.elements.sitePurpose.value;

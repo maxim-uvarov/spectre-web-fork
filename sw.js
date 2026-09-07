@@ -2,7 +2,7 @@
 // Why: the page describes itself as an offline password cipher, and a home screen
 // install is only worth having if it opens without a network.
 
-const CACHE = "spectre-web-v1";
+const CACHE = "spectre-web-v2";
 
 // Everything index.html loads from this origin, plus the worker chain.
 const PRECACHE = [
@@ -16,6 +16,7 @@ const PRECACHE = [
     "js/spectre/spectre-worker.js",
     "js/spectre/spectre-algorithm.js",
     "js/spectre/scrypt.js",
+    "js/spectre/bip39.js",
     "js/spectre/pbkdf2.js",
     "images/icon.svg",
     "images/icon.png",

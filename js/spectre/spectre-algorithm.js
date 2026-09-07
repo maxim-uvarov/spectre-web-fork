@@ -24,6 +24,7 @@
 
 importScripts(new URL("js/spectre/spectre-types.js", baseURI).href);
 importScripts(new URL("js/spectre/scrypt.js", baseURI).href);
+importScripts(new URL("js/spectre/bip39.js", baseURI).href);
 
 class SpectreError extends Error {
     constructor(cause, ...params) {
@@ -196,13 +197,24 @@ spectre.newSiteResult = Object.freeze(async(userKey, siteName,
     keyPurpose = spectre.purpose.authentication, keyContext = null) => {
     console.trace(`[spectre]: result: ${siteName} (resultType=${resultType}, keyCounter=${keyCounter}, keyPurpose=${keyPurpose}, keyContext=${keyContext})`);
 
+    let siteKey = await spectre.newSiteKey(userKey, siteName, keyCounter, keyPurpose, keyContext)
+    let siteKeyBytes = siteKey.keyData
+
+    // The site key is 32 bytes of HMAC output, exactly the entropy of a 24-word
+    // mnemonic, so the seed follows from name, secret, site and counter alone.
+    // Why: a wallet seed has no rate limit and no reset, the chain is public, so
+    // the master secret behind it must be long and random; the user accepted that.
+    // Not the V0 byte quirk below because: that exists for template indexing only.
+    // The result type arrives as a string from the form, hence the loose ==.
+    if (resultType == spectre.resultType.deriveMnemonic) {
+        return spectre.newMnemonic(siteKeyBytes);
+    }
+
     let resultTemplates = spectre.templates[resultType]
     if (!resultTemplates) {
         throw new SpectreError("resultType", `Unsupported result template: ${resultType}.`);
     }
 
-    let siteKey = await spectre.newSiteKey(userKey, siteName, keyCounter, keyPurpose, keyContext)
-    let siteKeyBytes = siteKey.keyData
     if (siteKey.keyAlgorithm < 1) {
         // V0 incorrectly converts bytes into 16-bit big-endian numbers.
         let siteKeyV0Bytes = new Uint16Array(siteKeyBytes.length);
