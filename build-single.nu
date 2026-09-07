@@ -1,5 +1,6 @@
 #!/usr/bin/env nu
-# Build the single-file variant of Spectre Web into single/.
+# Build the single-file variant of Spectre Web into docs/, the folder GitHub
+# Pages can publish from.
 #
 # Why: the user wants to verify what a host serves from an iPhone with Safari
 # and Shortcuts alone. One HTML file plus one service worker is a check of two
@@ -162,7 +163,7 @@ def build-sw [html: string]: nothing -> string {
 }
 
 def main []: nothing -> nothing {
-    let out = source-path single
+    let out = source-path docs
     mkdir $out
     let html = build-html
     $html | save --force ($out | path join index.html)
