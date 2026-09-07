@@ -90,6 +90,15 @@ siteForm.addEventListener("submit", (event) => {
 signOutButton.addEventListener("click", () => {
     spectre.invalidate();
 });
+// Why: the iOS app switcher keeps a snapshot of the last frame, and a seed
+// phrase must not sit in it. The result comes back from the cache on return.
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+        siteResult.value = "";
+    } else {
+        updateView();
+    }
+});
 siteName.addEventListener("input", updateSpectre);
 siteCounter.addEventListener("input", updateSpectre);
 siteType.addEventListener("input", updateSpectre);
