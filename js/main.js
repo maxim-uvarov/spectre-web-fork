@@ -1,140 +1,102 @@
-function spinnerBusy(element, busy) {
-    element.data("spin", busy);
+const userForm = document.getElementById("user");
+const userName = document.getElementById("userName");
+const userSecret = document.getElementById("userSecret");
+const algorithmVersion = document.getElementById("algorithmVersion");
+const userError = document.getElementById("userError");
+const siteForm = document.getElementById("site");
+const identity = document.getElementById("identity");
+const siteName = document.getElementById("siteName");
+const siteCounter = document.getElementById("siteCounter");
+const siteType = document.getElementById("siteType");
+const siteResult = document.getElementById("siteResult");
+const siteError = document.getElementById("siteError");
+const copyButton = document.getElementById("copy");
+const signOutButton = document.getElementById("signout");
 
-    if (busy) {
-        element.finish().fadeIn();
-    } else {
-        element.finish().fadeOut();
+for (let version = spectre.algorithm.first; version <= spectre.algorithm.last; version++) {
+    algorithmVersion.add(new Option(`V${version}`, version));
+}
+for (const template in spectre.templates) {
+    siteType.add(new Option(spectre.resultName[template], template));
+}
+
+function purpose() {
+    return siteForm.elements.sitePurpose.value;
+}
+
+function updateDefaults() {
+    algorithmVersion.value = spectre.algorithm.current;
+    siteCounter.value = spectre.counter.initial;
+    switch (purpose()) {
+        case spectre.purpose.authentication:
+            siteType.value = spectre.resultType.defaultPassword;
+            break;
+        case spectre.purpose.identification:
+            siteType.value = spectre.resultType.defaultLogin;
+            break;
+        case spectre.purpose.recovery:
+            siteType.value = spectre.resultType.defaultAnswer;
+            break;
     }
 }
 
-$(() => {
-    let signOutButton = $('#signout');
-    let user = $('#user');
-    let userForm = user.find('form');
-    let userName = user.find('#userName');
-    let userNameInput = userName.find('input');
-    let userSecret = user.find('#userSecret');
-    let userSecretInput = userSecret.find('input');
-    let userSecretSpinner = userSecret.find('.fa-spin');
-    let userAlgorithm = user.find('#algorithmVersion');
-    let userAlgorithmInput = userAlgorithm.find('select');
-    let userMessage = user.find('p.info');
-    let userError = user.find('p.error');
-    let site = $('#site');
-    let siteForm = site.find('form');
-    let siteName = site.find('#siteName');
-    let siteNameInput = siteName.find('input');
-    let sitePurposeInputs = site.find('input[name="sitePurpose"]');
-    let siteCounter = site.find('#siteCounter');
-    let siteCounterInput = siteCounter.find('input');
-    let siteType = site.find('#siteType');
-    let siteTypeInput = siteType.find('select');
-    let siteResult = site.find('#siteResult');
-    let siteResultSpinner = siteResult.find('.fa-spin');
-    let siteResultButton = siteResult.find('button');
-    let siteResultInput = siteResultButton.find('input')
-    let siteMessage = site.find('p.info');
-    let siteError = site.find('p.error');
+function updateSpectre() {
+    spectre.request(siteName.value, siteType.value, siteCounter.value, purpose(), null);
+}
 
-    for (template in spectre.templates) {
-        let option = document.createElement('option');
-        option.text = spectre.resultName[template];
-        option.value = template;
-        siteTypeInput[0].add(option);
+// The identicon is the check that the secret was typed right: it is derived
+// from name and secret, so a typo shows a different figure.
+function identicon(icon) {
+    return icon ? [icon.leftArm, icon.body, icon.rightArm, icon.accessory].join("") : "";
+}
+
+function updateView() {
+    const user = spectre.operations.user;
+    const site = spectre.operations.site;
+    const signedIn = user.authenticated;
+
+    userForm.hidden = signedIn;
+    siteForm.hidden = !signedIn;
+    userError.textContent = user.error || "";
+    siteError.textContent = site.error || "";
+    userSecret.value = "";
+
+    if (signedIn) {
+        identity.textContent = `${user.userName} ${identicon(user.identicon)}`;
+        siteResult.value = spectre.result(siteName.value, purpose()) || (site.pending ? "…" : "");
+    } else {
+        userName.value = user.userName || "";
+        siteName.value = "";
+        siteResult.value = "";
     }
-    for (option of sitePurposeInputs) {
-        option.checked = option.value === spectre.purpose.authentication;
-    }
+}
 
-    function updateDefaults() {
-        userAlgorithmInput[0].value = spectre.algorithm.current;
-        siteCounterInput[0].value = spectre.counter.initial;
-        
-        switch (sitePurposeInputs.filter(':checked')[0].value) {
-            case spectre.purpose.authentication: {
-                siteTypeInput[0].value = spectre.resultType.defaultPassword;
-                break;
-            }
-            case spectre.purpose.identification: {
-                siteTypeInput[0].value = spectre.resultType.defaultLogin;
-                break;
-            }
-            case spectre.purpose.recovery: {
-                siteTypeInput[0].value = spectre.resultType.defaultAnswer;
-                break;
-            }
-        }
-    }
+updateDefaults();
+spectre.observers.push(updateView);
+updateView();
 
-    function updateSpectre() {
-        spectre.request(
-            siteNameInput[0].value,
-            siteTypeInput[0].value,
-            siteCounterInput[0].value,
-            sitePurposeInputs.filter(':checked')[0].value,
-            null //keyContext
-        );
-    }
-
-    function updateView() {
-        spinnerBusy(userSecretSpinner, spectre.operations.user.pending);
-        spinnerBusy(siteResultSpinner, spectre.operations.site.pending);
-
-        userNameInput.val(spectre.operations.user.userName);
-        userSecretInput.val(null);
-        siteResultInput.val(spectre.result(siteNameInput[0].value, sitePurposeInputs.filter(':checked')[0].value));
-
-        if (spectre.operations.user.authenticated) {
-            user.attr("data-active", false);
-            site.attr("data-active", true);
-            siteNameInput.focus()
-        } else {
-            user.attr("data-active", true);
-            site.attr("data-active", false);
-            userAlgorithmInput.val(spectre.algorithm.current);
-            siteNameInput.val(null);
-            userNameInput.focus()
-        }
-    }
-
-    updateDefaults();
-    spectre.observers.push(updateView);
-    updateView();
-
-    userForm.on('submit', (e) => {
-        e.preventDefault();
-        spectre.authenticate(userNameInput[0].value, userSecretInput[0].value, userAlgorithmInput[0].value);
-    });
-    siteForm.on('submit', (e) => {
-        e.preventDefault()
-        siteResultInput.select()
-        navigator.clipboard.writeText(siteResultInput[0].value).then(() => {
-            siteResultButton.attr("title", "Copied!").tooltip("_fixTitle").tooltip("show");
-            setTimeout(() => {
-                siteResultButton.tooltip("hide").attr("title", "Copy Password").tooltip("_fixTitle");
-            }, 1000);
-        });
-    });
-
-    signOutButton.on('click', () => {
-        spectre.invalidate();
-    });
-    siteNameInput.on('input', () => {
-        updateSpectre();
-    });
-    sitePurposeInputs.on('input', () => {
-        updateDefaults();
-        updateSpectre();
-    });
-    siteCounterInput.on('input', () => {
-        updateSpectre();
-    });
-    siteTypeInput.on('input', () => {
-        updateSpectre();
+userForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    spectre.authenticate(userName.value, userSecret.value, algorithmVersion.value);
+});
+siteForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    navigator.clipboard.writeText(siteResult.value).then(() => {
+        copyButton.textContent = "Copied";
+        setTimeout(() => { copyButton.textContent = "Copy"; }, 1000);
     });
 });
+signOutButton.addEventListener("click", () => {
+    spectre.invalidate();
+});
+siteName.addEventListener("input", updateSpectre);
+siteCounter.addEventListener("input", updateSpectre);
+siteType.addEventListener("input", updateSpectre);
+siteForm.elements.sitePurpose.forEach((radio) => radio.addEventListener("input", () => {
+    updateDefaults();
+    updateSpectre();
+}));
 
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js");
 }

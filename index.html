@@ -4,187 +4,70 @@
         <meta charset="utf-8">
         <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; worker-src 'self' blob:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
         <title>Spectre Web fork</title>
-        <meta name="description" content="Password manager and secure identity platform. Spectre is a free and offline password cipher." />
-        <meta name="keywords" content="password manager,password generator,passwords,free,secure,strong,random,online,offline,privacy,web" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#3E8989">
-        <meta name="author" content="Maarten Billemont">
         <meta name="referrer" content="no-referrer">
-        <link rel="author" href="https://lhunath.com">
         <link rel="icon" href="images/icon.svg">
         <link rel="manifest" href="manifest.webmanifest">
         <link rel="apple-touch-icon" href="images/icon.png">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-title" content="Spectre fork">
         <meta name="apple-mobile-web-app-status-bar-style" content="default">
-        <link rel="stylesheet" href="plugins/bootstrap/bootstrap.min.css">
-        <link rel="stylesheet" href="plugins/fontawesome/css/fontawesome.min.css">
-        <link rel="stylesheet" href="plugins/fontawesome/css/solid.min.css">
-        <link rel="stylesheet" href="css/spectre-base.css" media="screen">
-        <link rel="stylesheet" href="css/spectre-web.css" media="screen">
-        <script defer src="plugins/jquery/jquery.min.js"></script>
+        <link rel="stylesheet" href="css/spectre.css">
     </head>
 
     <body>
-        <div class="banner">
-            <div class="container">
-                <h4>Spectre Web fork</h4>
-                <p>A modified fork of the Spectre 3.0-alpha.2 web app, changed in 2026. Not the official Spectre.</p>
-                <a href="https://github.com/maxim-uvarov/spectre-web-fork" class="btn btn-transparent">Source Code</a>
-            </div>
-        </div>
+        <header>
+            <h1>Spectre Web fork</h1>
+            <p>A modified fork of the Spectre 3.0-alpha.2 web app, changed in 2026. Not the official Spectre. <a href="https://github.com/maxim-uvarov/spectre-web-fork">Source code</a>.</p>
+        </header>
 
-        <section id="application">
-            <div id="user" class="container" data-active="true">
-                <div class="row justify-content-center">
-                    <div class="col-lg-6 text-center box">
-                        <i class="fa-solid fa-user-circle"></i>
-                        <hr>
+        <main>
+            <form id="user">
+                <label>Full name
+                    <input id="userName" type="text" autocomplete="off" autocapitalize="words">
+                </label>
+                <label>Spectre secret
+                    <input id="userSecret" type="password" autocomplete="off">
+                </label>
+                <label>Algorithm version
+                    <select id="algorithmVersion"></select>
+                </label>
+                <p id="userError" class="error"></p>
+                <button type="submit">Sign in</button>
+            </form>
 
-                        <form>
-                            <p>
-                                <label id="userName">
-                                    <i class="fa-solid fa-fw fa-user-large"></i>
-                                    Your Full Name
-                                    <input type="text" placeholder="eg. Robert Lee Mitchell" autocomplete="off">
-                                </label>
-                            </p>
-
-                            <p>
-                                <label id="userSecret">
-                                    <i class="fa-solid fa-fw fa-user-lock"></i>
-                                    Your Spectre Secret
-                                    <i class="fa-solid fa-fw fa-spinner fa-spin"></i>
-                                    <input type="password" placeholder="eg. banana colored duckling" autocomplete="off">
-                                </label>
-                            </p>
-
-                            <p>
-                                <label id="algorithmVersion">
-                                    <i class="fa-solid fa-fw fa-clock-rotate-left"></i>
-                                    Algorithm Version
-                                    <select>
-                                        <option value="0">V0 (2012:03)</option>
-                                        <option value="1">V1 (2012:07)</option>
-                                        <option value="2">V2 (2014:09)</option>
-                                        <option value="3" selected>V3 (2015:01)</option>
-                                    </select>
-                                </label>
-                            </p>
-
-                            <hr>
-    
-                            <p class="info"></p>
-                            <p class="error"></p>
-    
-                            <p>
-                                <button type="submit" id="signin">
-                                    <i class="fa-solid fa-fw fa-2x fa-right-to-bracket"></i><br>
-                                    Sign In
-                                </button>
-                            </p>
-                        </form>
-
-                        <p class="caption">Your information remains 100% offline.</p>
-                    </div>
+            <form id="site" hidden>
+                <p id="identity"></p>
+                <label>Site
+                    <input id="siteName" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="url">
+                </label>
+                <fieldset id="sitePurpose">
+                    <label><input type="radio" name="sitePurpose" value="com.lyndir.masterpassword" checked>Password</label>
+                    <label><input type="radio" name="sitePurpose" value="com.lyndir.masterpassword.login">Login name</label>
+                    <label><input type="radio" name="sitePurpose" value="com.lyndir.masterpassword.answer">Security answer</label>
+                </fieldset>
+                <div class="row">
+                    <label>Counter
+                        <input id="siteCounter" type="number" min="1" max="100" value="1" inputmode="numeric">
+                    </label>
+                    <label>Type
+                        <select id="siteType"></select>
+                    </label>
                 </div>
-            </div>
+                <output id="siteResult"></output>
+                <p id="siteError" class="error"></p>
+                <button type="submit" id="copy">Copy</button>
+                <button type="button" id="signout">Sign out</button>
+            </form>
+        </main>
 
-            <div id="site" class="container" data-active="false">
-                <div class="row justify-content-center">
-                    <div class="col-lg-6 text-center box">
-                        <i class="fa-solid fa-globe"></i>
-                        <hr>
-
-                        <form>
-                            <p>
-                                <label id="siteName">
-                                    <i class="fa-solid fa-fw fa-globe"></i>
-                                    Password Name or Site Domain
-                                    <input type="text" placeholder="eg. twitter.com">
-                                </label>
-                            </p>
-    
-                            <div class="row justify-content-center">
-                                <div class="col-lg-6">
-                                    <p>
-                                        <label id="siteCounter">
-                                            <i class="fa-solid fa-fw fa-clock-rotate-left"></i>
-                                            Password Number
-                                            <input type="number" placeholder="1" min="1" max="100" value="1" class="half" />
-                                        </label>
-                                    </p>
-                                </div>
-        
-                                <div class="col-lg-6">
-                                    <p>
-                                        <label id="siteType">
-                                            <i class="fa-solid fa-fw fa-key"></i>
-                                            Password Type
-                                            <select></select>
-                                        </label>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <hr>
-
-                            <p>
-                                <input type="radio" name="sitePurpose" id="sitePurposePassword" value="com.lyndir.masterpassword">
-                                <label for="sitePurposePassword">Password</label>
-                                <input type="radio" name="sitePurpose" id="sitePurposeLogin" value="com.lyndir.masterpassword.login">
-                                <label for="sitePurposeLogin">Login Name</label>
-                                <input type="radio" name="sitePurpose" id="sitePurposeAnswer" value="com.lyndir.masterpassword.answer">
-                                <label for="sitePurposeAnswer">Security Answer</label>
-                            </p>
-        
-                            <p>
-                                <label id="siteResult">
-                                    <i class="fa-solid fa-fw fa-key"></i>
-                                    Result
-                                    <i class="fa-solid fa-fw fa-spinner fa-spin"></i>
-                                    <button type="submit" class="fa-solid fa-copy">
-                                        <input class="code" value="PozoLalv0_Yelo" readonly="">
-                                    </button>
-                                </label>
-                            </p>
-                        </form>
-
-                        <p class="info"></p>
-                        <p class="error"></p>
-
-                        <hr>
-
-                        <p>
-                            <button type="submit" id="signout">
-                                <i class="fa-solid fa-fw fa-2x fa-right-from-bracket"></i><br>
-                                Sign Out
-                            </button>
-                        </p>
-
-                        <p class="caption">Your information remains 100% offline.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <footer id="footer">
-            <div class="container">
-                <div class="row wow fadeInUp" data-wow-duration="500ms">
-                    <div class="col-12 text-center">
-                        <div class="copyright">
-                            <p>Based on <a href="https://spectre.app/">Spectre</a>, Copyright © 2011 <a href="https://lhunath.com">Maarten Billemont</a>. Modified 2026.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <footer>
+            <p>Based on <a href="https://spectre.app/">Spectre</a>, Copyright © 2011 <a href="https://lhunath.com">Maarten Billemont</a>. Modified 2026. Everything stays on this device.</p>
         </footer>
 
-        <!-- Scripts -->
-        <script defer src="plugins/bootstrap/bootstrap.bundle.min.js"></script>
         <script defer src="js/spectre/spectre-types.js"></script>
         <script defer src="js/spectre/spectre-service.js"></script>
         <script defer src="js/main.js"></script>
     </body>
-
 </html>

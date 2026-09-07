@@ -1,0 +1,124 @@
+/* One column for one phone. Every control is 18px or larger:
+   iOS Safari zooms into a focused field whose text is under 16px. */
+
+:root {
+    color-scheme: light dark;
+    --accent: #3E8989;
+}
+
+body {
+    max-width: 30rem;
+    margin: 0 auto;
+    padding: 1rem;
+    font: 18px/1.4 system-ui, sans-serif;
+}
+
+h1 {
+    margin: 0 0 0.25rem;
+    font-size: 1.4rem;
+}
+
+header p, footer p {
+    margin: 0 0 1rem;
+    font-size: 0.85rem;
+    opacity: 0.75;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+form {
+    display: grid;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: grid;
+    gap: 0.25rem;
+}
+
+.row {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.row > label {
+    flex: 1;
+}
+
+input, select, button, output {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    font: inherit;
+    border: 1px solid #888;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: inherit;
+}
+
+button {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+}
+
+#signout {
+    background: transparent;
+    color: inherit;
+    border-color: #888;
+}
+
+fieldset {
+    display: flex;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+fieldset label {
+    flex: 1;
+    display: block;
+    padding: 0.6rem 0;
+    text-align: center;
+    border: 1px solid #888;
+    border-radius: 0.5rem;
+}
+
+fieldset input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+fieldset label:has(:checked) {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+}
+
+#identity {
+    margin: 0;
+}
+
+output {
+    display: block;
+    min-height: 3rem;
+    font-family: ui-monospace, monospace;
+    font-size: 22px;
+    word-break: break-all;
+    user-select: all;
+}
+
+.error {
+    margin: 0;
+    color: #c33;
+}
+
+.error:empty {
+    display: none;
+}
