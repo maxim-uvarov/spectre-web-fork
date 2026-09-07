@@ -2,6 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; worker-src 'self' blob:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
         <title>Spectre Web</title>
         <meta name="description" content="Password manager and secure identity platform. Spectre is a free and offline password cipher." />
         <meta name="keywords" content="password manager,password generator,passwords,free,secure,strong,random,online,offline,privacy,web" />
@@ -143,7 +144,7 @@
         
                             <p>
                                 <label id="siteResult">
-                                    <i class="fa-duotone fa-fw" style="background: url('images/spectre-light-glyph.svg') no-repeat center/contain"></i>
+                                    <i class="fa-duotone fa-fw glyph-spectre"></i>
                                     Result
                                     <i class="fa-duotone fa-fw fa-galaxy fa-spin"></i>
                                     <button type="submit" class="fa-solid fa-copy">

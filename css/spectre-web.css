@@ -58,3 +58,6 @@
     bottom: 0.2em;
     left: 0;
 }
+.glyph-spectre {
+    background: url("../images/spectre-light-glyph.svg") no-repeat center/contain;
+}
