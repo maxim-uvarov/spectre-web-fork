@@ -97,6 +97,16 @@ def check-bip39-list []: nothing -> nothing {
     }
 }
 
+# Why: the seed derivation is a contract, see SEED-WORDS.md. A build that moves
+# a vector must not reach docs/.
+def check-seed-words []: nothing -> nothing {
+    let result = node (source-path test/seed-words.mjs) | complete
+    if $result.exit_code != 0 {
+        error make {msg: $"seed words test failed:\n($result.stderr)"}
+    }
+    print $result.stdout
+}
+
 def worker-source []: nothing -> string {
     $WORKER_CHAIN
     | each {|file| read-text $file | lines | where $it !~ '^importScripts\(' | str join "\n" }
@@ -172,6 +182,7 @@ def build-sw [html: string]: nothing -> string {
 
 def main []: nothing -> nothing {
     check-bip39-list
+    check-seed-words
     let out = source-path docs
     mkdir $out
     let html = build-html
