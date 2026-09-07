@@ -7,7 +7,7 @@
 # URLs; the multi-file layout is twenty. The sources stay multi-file, this
 # script inlines them, so nothing is maintained twice.
 #
-# Usage: nu build-single.nu
+# Usage: nu build-single.nu [--skip-tests]
 
 const ROOT = path self | path dirname
 
@@ -180,9 +180,13 @@ def build-sw [html: string]: nothing -> string {
     | must-replace --regex '(?s)const PRECACHE = \[.*?\];' 'const PRECACHE = ["./", "index.html", "sw.js"];'
 }
 
-def main []: nothing -> nothing {
+# --skip-tests leaves out the node test only; the word list hash check is pure
+# Nushell and stays.
+def main [--skip-tests]: nothing -> nothing {
     check-bip39-list
-    check-seed-words
+    if not $skip_tests {
+        check-seed-words
+    }
     let out = source-path docs
     mkdir $out
     let html = build-html
