@@ -58,3 +58,8 @@
     bottom: 0.2em;
     left: 0;
 }
+/* Why: iOS Safari zooms the page when a focused field renders text below 16px,
+   and several inputs sit inside blocks with a reduced font size. */
+input, textarea, select {
+    font-size: max(1em, 16px);
+}
