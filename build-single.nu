@@ -29,6 +29,12 @@ const WORKER_CHAIN = [
     js/spectre/spectre-worker.js
 ]
 
+# The BIP-39 English list, as shipped: sha256 of the words, one per line.
+# Why: a changed word changes every seed phrase, silently. A wallet made on
+# the old build would not restore on the new one, so the build must stop
+# before it ships that.
+const BIP39_LIST_SHA256 = "2f5eed53a4727b4bf8880d8f3f199efc90e58503646d9ff8eff3a2ed3b24dbda"
+
 def source-path [relative: string]: nothing -> string {
     $ROOT | path join $relative | path expand
 }
@@ -77,6 +83,18 @@ def inline-css [relative: string]: nothing -> string {
 
 def inline-js [relative: string]: nothing -> string {
     read-text $relative | str replace --regex '//# sourceMappingURL=.*' ''
+}
+
+def check-bip39-list []: nothing -> nothing {
+    let words = read-text js/spectre/bip39.js
+        | parse --regex r#'(?s)spectre\.bip39Words = Object\.freeze\(\[(?<body>.*?)\]\);'#
+        | get body.0
+        | parse --regex r#'"(?<word>[a-z]+)"'#
+        | get word
+    let actual = $words | str join "\n" | $in + "\n" | hash sha256
+    if ($words | length) != 2048 or $actual != $BIP39_LIST_SHA256 {
+        error make {msg: $"BIP-39 word list changed: ($words | length) words, sha256 ($actual)"}
+    }
 }
 
 def worker-source []: nothing -> string {
@@ -153,6 +171,7 @@ def build-sw [html: string]: nothing -> string {
 }
 
 def main []: nothing -> nothing {
+    check-bip39-list
     let out = source-path docs
     mkdir $out
     let html = build-html
