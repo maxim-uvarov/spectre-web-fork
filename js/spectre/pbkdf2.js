@@ -1,6 +1,7 @@
+/*! by Tom Thorogood <me@tomthorogood.co.uk> */
 /*! This work is licensed under the Creative Commons Attribution 4.0
 International License. To view a copy of this license, visit
-http://creativecommons.org/licenses/by/4.0/ or see LICENSE. */
+http://creativecommons.org/licenses/by/4.0/ or see NOTICE.md. */
 
 // Native WebCrypto PBKDF2 is blocked by:
 // - https://bugzilla.mozilla.org/show_bug.cgi?id=1469482
