@@ -97,7 +97,9 @@ signOutButton.addEventListener("click", () => {
 document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
         siteResult.value = "";
-    } else {
+    } else if (spectre.operations.user.authenticated) {
+        // Not an unconditional updateView because: signed out, it resets the
+        // sign-in fields, and a screen lock mid-typing would erase the secret.
         updateView();
     }
 });
