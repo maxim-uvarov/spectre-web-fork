@@ -38,8 +38,8 @@ class SpectreUser {
     constructor(userName, userSecret, algorithmVersion = spectre.algorithm.current) {
         this.userName = userName;
         this.algorithmVersion = algorithmVersion;
-        this.identiconPromise = spectre.newIdenticon(userName, userSecret);
         this.userKeyPromise = spectre.newUserKey(userName, userSecret, algorithmVersion);
+        this.identiconPromise = this.userKeyPromise.then(spectre.newIdenticon);
 
     }
 
@@ -239,13 +239,16 @@ spectre.newSiteResult = Object.freeze(async(userKey, siteName,
     }).join("");
 });
 
-spectre.newIdenticon = Object.freeze(async(userName, userSecret) => {
-    console.trace(`[spectre]: identicon: ${userName}`);
+// Why: upstream keyed this HMAC with the raw secret, no scrypt in front, so
+// the figure was a fast oracle on the secret: about 12 bits of it, checkable
+// at hash speed by anyone who saw it. Signing with the user key instead costs
+// one scrypt per guess, the same as the password. The key already binds the
+// name, so a fixed message is enough; the message is distinct from every
+// site salt, which all start with a purpose string followed by a length.
+spectre.newIdenticon = Object.freeze(async(userKey) => {
+    console.trace(`[spectre]: identicon`);
 
-    let key = await crypto.subtle.importKey("raw", spectre.encoder.encode(userSecret), {
-        name: "HMAC", hash: {name: "SHA-256"}
-    }, false, ["sign"])
-    let seed = new Uint8Array(await crypto.subtle.sign("HMAC", key, spectre.encoder.encode(userName)))
+    let seed = new Uint8Array(await crypto.subtle.sign("HMAC", userKey.keyCrypto, spectre.encoder.encode(spectre.purpose.identicon)))
 
     return {
         "leftArm": spectre.identicons.leftArm[seed[0] % spectre.identicons.leftArm.length],

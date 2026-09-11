@@ -48,6 +48,8 @@ spectre.purpose = Object.freeze({
     recovery: "com.lyndir.masterpassword.answer",
     /** Generate a wallet seed. Fork-local, and frozen for good: see SEED-WORDS.md. */
     seed: "com.lyndir.masterpassword.seed",
+    /** Generate the identicon. Fork-local: the message the user key signs for it. */
+    identicon: "com.lyndir.masterpassword.identicon",
 });
 spectre.class = Object.freeze({
     /** Use the site key to generate a result from a template. */
