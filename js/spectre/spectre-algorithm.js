@@ -69,13 +69,6 @@ class SpectreUser {
     invalidate() {
         this.userKeyPromise = Promise.reject(new SpectreError("invalidate", `User logged out.`));
     }
-
-    static async test() {
-        let user = await new SpectreUser("Robert Lee Mitchell", "banana colored duckling");
-        let password = await user.authenticate("masterpasswordapp.com")
-        if (password !== "Jejr5[RepuSosp")
-            throw "Internal consistency test failed.";
-    }
 }
 
 spectre.newUserKey = Object.freeze(async(userName, userSecret, algorithmVersion = spectre.algorithm.current) => {
