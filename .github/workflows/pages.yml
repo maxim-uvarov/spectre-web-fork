@@ -7,6 +7,11 @@
 # the two published URLs; the build is deterministic.
 #
 # Requires Settings > Pages > Source set to "GitHub Actions".
+#
+# Actions are pinned to commits, not tags. Why: a tag is mutable, so whoever
+# controls it controls the build that produces the page which derives wallet
+# seeds. The trailing comment names the version the commit was taken from, so
+# the pin can be bumped on purpose.
 
 name: pages
 
@@ -28,15 +33,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: hustcer/setup-nu@v3
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: hustcer/setup-nu@9215c80adb545a85c419d5085b76eb6d082f49e7 # v3.27
         with:
           # Pinned: the built bytes depend on the Nushell version, and a
           # local rebuild for comparison has to match.
           version: "0.115.1"
       # The seed words test runs inside the build; node is preinstalled.
       - run: nu build-single.nu
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
           path: dist
 
@@ -48,4 +53,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
