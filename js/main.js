@@ -26,9 +26,9 @@ function purpose() {
     return siteForm.elements.sitePurpose.value;
 }
 
-function updateDefaults() {
-    algorithmVersion.value = spectre.algorithm.current;
-    siteCounter.value = spectre.counter.initial;
+// Only the type follows the purpose. Not the counter because: a user who set
+// counter 3 and then switched purpose lost it, silently, and derived for 1.
+function updateType() {
     switch (purpose()) {
         case spectre.purpose.authentication:
             siteType.value = spectre.resultType.defaultPassword;
@@ -87,7 +87,9 @@ function updateView() {
     }
 }
 
-updateDefaults();
+algorithmVersion.value = spectre.algorithm.current;
+siteCounter.value = spectre.counter.initial;
+updateType();
 spectre.observers.push(updateView);
 updateView();
 
@@ -120,7 +122,7 @@ siteName.addEventListener("input", updateSpectre);
 siteCounter.addEventListener("input", updateSpectre);
 siteType.addEventListener("input", updateSpectre);
 siteForm.elements.sitePurpose.forEach((radio) => radio.addEventListener("input", () => {
-    updateDefaults();
+    updateType();
     updateSpectre();
 }));
 
