@@ -171,12 +171,12 @@ def build-html []: nothing -> string {
 }
 
 # The cache name carries the hash of index.html, so a new build changes sw.js
-# and the browser replaces the old cache on its own; no manual bump.
+# and the browser replaces the old cache on its own, on the first load rather
+# than the second that the background refresh in sw.js would take.
 def build-sw [html: string]: nothing -> string {
     let build = $html | hash sha256 | str substring 0..15
     read-text sw.js
     | must-replace --regex 'const CACHE = "[^"]*";' $'const CACHE = "spectre-web-single-($build)";'
-    | must-replace 'Bump CACHE to ship new assets.' 'The cache name carries the build hash, so a new build ships itself.'
     | must-replace --regex '(?s)const PRECACHE = \[.*?\];' 'const PRECACHE = ["./", "index.html", "sw.js"];'
 }
 

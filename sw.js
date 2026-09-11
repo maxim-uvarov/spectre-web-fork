@@ -36,20 +36,23 @@ self.addEventListener("activate", event => {
               .then(() => self.clients.claim()));
 });
 
-// Cache first, then network; whatever the network returns is cached for next time.
+// Cache first, and refresh the cache from the network in the background.
 // Not network-first because: the app has no server state to refresh, and cache-first
-// is what makes it open instantly and offline. Bump CACHE to ship new assets.
+// is what makes it open instantly and offline. Not plain cache-first because: it
+// served the old JS forever unless CACHE was bumped by hand on every change; now a
+// change reaches the browser on the load after the one that fetched it.
+// The refresh bypasses the HTTP cache for the same reason the install does.
 self.addEventListener("fetch", event => {
     if (event.request.method !== "GET") {
         return;
     }
 
-    event.respondWith(
-        caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
-            if (response.ok) {
-                let copy = response.clone();
-                caches.open(CACHE).then(cache => cache.put(event.request, copy));
-            }
-            return response;
-        })));
+    const refresh = fetch(new Request(event.request, {cache: "reload"})).then(response => {
+        if (response.ok) {
+            let copy = response.clone();
+            caches.open(CACHE).then(cache => cache.put(event.request, copy));
+        }
+        return response;
+    });
+    event.respondWith(caches.match(event.request).then(cached => cached || refresh));
 });
