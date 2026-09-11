@@ -42,8 +42,16 @@ function updateDefaults() {
     }
 }
 
+// Why: the counter field's min/max/step are the single definition of a valid
+// counter. The algorithm accepts any integer up to 2^32-1 and truncates a
+// fraction, so an invalid entry used to show a derived result that the Copy
+// button then refused; now nothing is derived until the field validates.
 function updateSpectre() {
-    spectre.request(siteName.value, siteType.value, siteCounter.value, purpose(), null);
+    if (siteCounter.validity.valid) {
+        spectre.request(siteName.value, siteType.value, siteCounter.value, purpose(), null);
+    } else {
+        updateView();
+    }
 }
 
 // The identicon is the check that the secret was typed right: it is derived
@@ -66,7 +74,12 @@ function updateView() {
     if (signedIn) {
         identity.textContent = `${user.userName} ${identicon(user.identicon)}`;
         seedNotice.hidden = siteType.value != spectre.resultType.deriveMnemonic;
-        siteResult.value = spectre.result(siteName.value, purpose(), null, siteType.value, siteCounter.value) || (site.pending ? "…" : "");
+        if (siteCounter.validity.valid) {
+            siteResult.value = spectre.result(siteName.value, purpose(), null, siteType.value, siteCounter.value) || (site.pending ? "…" : "");
+        } else {
+            siteError.textContent = siteCounter.validationMessage;
+            siteResult.value = "";
+        }
     } else {
         userName.value = user.userName || "";
         siteName.value = "";
