@@ -47,12 +47,20 @@ self.addEventListener("fetch", event => {
         return;
     }
 
-    const refresh = fetch(new Request(event.request, {cache: "reload"})).then(response => {
+    // Fetched by URL, not by cloning the request: cloning a navigation request
+    // with an init threw in older engines, synchronously, before respondWith,
+    // and the offline open is the one request that must not fall through.
+    const refresh = fetch(event.request.url, {cache: "reload"}).then(response => {
         if (response.ok) {
             let copy = response.clone();
-            caches.open(CACHE).then(cache => cache.put(event.request, copy));
+            return caches.open(CACHE).then(cache => cache.put(event.request, copy)).then(() => response);
         }
         return response;
     });
+    // Why: once the cached answer is sent the worker may be stopped before the
+    // put lands; waitUntil keeps it alive. Offline, the refresh rejects and
+    // that is expected, so the kept copy swallows it; the copy handed to
+    // respondWith on a cache miss still rejects, which is the real error.
+    event.waitUntil(refresh.catch(() => {}));
     event.respondWith(caches.match(event.request).then(cached => cached || refresh));
 });
