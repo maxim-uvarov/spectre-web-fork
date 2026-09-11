@@ -238,10 +238,14 @@ spectre.newSiteResult = Object.freeze(async(userKey, siteName,
 // one scrypt per guess, the same as the password. The key already binds the
 // name, so a fixed message is enough; the message is distinct from every
 // site salt, which all start with a purpose string followed by a length.
+// Not a spectre.purpose entry because: a purpose is what a site key is
+// derived under, and the test walks all of them; this message is signed once
+// by the user key and never reaches newSiteKey.
+const IDENTICON_MESSAGE = spectre.encoder.encode("com.lyndir.masterpassword.identicon");
 spectre.newIdenticon = Object.freeze(async(userKey) => {
     console.trace(`[spectre]: identicon`);
 
-    let seed = new Uint8Array(await crypto.subtle.sign("HMAC", userKey.keyCrypto, spectre.encoder.encode(spectre.purpose.identicon)))
+    let seed = new Uint8Array(await crypto.subtle.sign("HMAC", userKey.keyCrypto, IDENTICON_MESSAGE))
 
     return {
         "leftArm": spectre.identicons.leftArm[seed[0] % spectre.identicons.leftArm.length],
