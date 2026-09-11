@@ -65,6 +65,6 @@ if __name__ == "__main__":
 ## Consumers
 
 The words are a standard mnemonic, so any BIP-39 tool accepts them.
-One known consumer is the air-gapped SSH signer at `/Users/user/git/cy-container/okpairgappedsigner`: it takes the 24 words with an empty passphrase, derives the BIP-39 seed and uses its first 32 bytes as an Ed25519 seed.
+One known consumer is the air-gapped SSH signer `okpairgappedsigner`: it takes the 24 words with an empty passphrase, derives the BIP-39 seed and uses its first 32 bytes as an Ed25519 seed.
 For the test vector above that gives the key `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOiLs9b+36JwnWAtcTIKYE28XWx84r5PIFPM4G7ltblH`, fingerprint `SHA256:56GCTKnyQOHsuIQVNHcPmC0vOYjDzFXebn4Q/73N650`.
 That convention is the signer's, not this page's, and nothing here tests it; the signer's own Nushell module and an independent Node derivation agree on it.
