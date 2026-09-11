@@ -1,0 +1,51 @@
+# Build the single-file page and publish it to GitHub Pages.
+#
+# Why: the served bytes are built here from the pushed commit, not committed
+# alongside the sources. A committed docs/ folder looked like documentation
+# and was rebuilt by hand after every change. To verify what the host serves,
+# rebuild the reviewed commit with `nu build-single.nu` and compare dist/ to
+# the two published URLs; the build is deterministic.
+#
+# Requires Settings > Pages > Source set to "GitHub Actions".
+
+name: pages
+
+on:
+  push:
+    branches: [pwa-homescreen]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hustcer/setup-nu@v3
+        with:
+          # Pinned: the built bytes depend on the Nushell version, and a
+          # local rebuild for comparison has to match.
+          version: "0.115.1"
+      # The seed words test runs inside the build; node is preinstalled.
+      - run: nu build-single.nu
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,6 +1,6 @@
 #!/usr/bin/env nu
-# Build the single-file variant of Spectre Web into docs/, the folder GitHub
-# Pages can publish from.
+# Build the single-file variant of Spectre Web into dist/. The Pages workflow
+# in .github/workflows/pages.yml publishes that folder.
 #
 # Why: the user wants to verify what a host serves from an iPhone with Safari
 # and Shortcuts alone. One HTML file plus one service worker is a check of two
@@ -98,7 +98,7 @@ def check-bip39-list []: nothing -> nothing {
 }
 
 # Why: the seed derivation is a contract, see SEED-WORDS.md. A build that moves
-# a vector must not reach docs/.
+# a vector must not reach dist/.
 def check-seed-words []: nothing -> nothing {
     let result = node (source-path test/seed-words.mjs) | complete
     if $result.exit_code != 0 {
@@ -187,7 +187,7 @@ def main [--skip-tests]: nothing -> nothing {
     if not $skip_tests {
         check-seed-words
     }
-    let out = source-path docs
+    let out = source-path dist
     mkdir $out
     let html = build-html
     $html | save --force ($out | path join index.html)
