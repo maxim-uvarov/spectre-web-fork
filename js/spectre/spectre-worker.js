@@ -137,7 +137,11 @@ onmessage = (msg) => {
         )
     }
 
-    if (msg.data.siteName && (!msg.data.userName || spectre.user.userName === msg.data.userName)) {
+    // A site request is any message that carries a siteName, empty included.
+    // Why: an empty name used to be dropped here without a reply, so the page
+    // stayed "pending" and showed "…" until the next derivation answered. Now
+    // it reaches newSiteKey, which rejects it, and the error reply clears it.
+    if (msg.data.siteName !== undefined && (!msg.data.userName || spectre.user.userName === msg.data.userName)) {
         let request = {
             siteName: msg.data.siteName,
             resultType: msg.data.resultType,
