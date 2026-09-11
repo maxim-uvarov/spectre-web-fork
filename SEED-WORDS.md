@@ -27,6 +27,7 @@ A wallet seed has no rate limit and no reset, and the chain is public, so the se
 All strings are UTF-8.
 `len(name)` is the byte length under V3 and the character length under V0-V2.
 `len(site)` is the byte length under V2-V3 and the character length under V0-V1.
+"Character length" is the UTF-16 code unit count, JavaScript's `.length`: it equals the code point count for text inside the Basic Multilingual Plane and is larger for emoji and other astral characters, so a Python port must not use `len()` there.
 The reference implementation below is V3 only.
 The BIP-39 English list is the upstream one, unchanged (sha256 `2f5eed53a4727b4bf8880d8f3f199efc90e58503646d9ff8eff3a2ed3b24dbda`).
 
