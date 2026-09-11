@@ -59,4 +59,5 @@ The source is broken down into several components:
 
 This repository hosts the self-contained Spectre web application.
 
-Simply open `index.html` and enjoy.
+Serve the folder over HTTP and open it there, for example `python3 -m http.server` and then `http://localhost:8000/`.
+Opening `index.html` from `file://` is not enough: Chrome refuses to start a Worker from a file URL, and the service worker needs http(s) or localhost in every browser.
