@@ -48,7 +48,7 @@ label {
     flex: 1;
 }
 
-input, select, button, output {
+input, select, textarea, button, output {
     box-sizing: border-box;
     width: 100%;
     padding: 0.6rem 0.8rem;
@@ -106,8 +106,10 @@ fieldset label:has(:checked) {
     gap: 0.75rem;
 }
 
+/* A set of recovery codes is pasted as one text, one code per line. */
 #maskText {
     font-family: ui-monospace, monospace;
+    resize: vertical;
 }
 
 #identity {

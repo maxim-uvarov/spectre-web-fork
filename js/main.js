@@ -137,10 +137,20 @@ signOutButton.addEventListener("click", () => {
 });
 // Why: the iOS app switcher keeps a snapshot of the last frame, and a seed
 // phrase must not sit in it. The result comes back from the cache on return.
+// The mask text is held aside the same way: masking, it is the plain code.
+let hiddenMaskText = null;
 document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
         siteResult.value = "";
-    } else if (spectre.operations.user.authenticated) {
+        hiddenMaskText = maskText.value;
+        maskText.value = "";
+        return;
+    }
+    if (hiddenMaskText !== null) {
+        maskText.value = hiddenMaskText;
+        hiddenMaskText = null;
+    }
+    if (spectre.operations.user.authenticated) {
         // Not an unconditional updateView because: signed out, it resets the
         // sign-in fields, and a screen lock mid-typing would erase the secret.
         updateView();
