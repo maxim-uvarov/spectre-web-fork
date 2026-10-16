@@ -101,5 +101,8 @@ I opened index.html on my *Mac*, but it doesn't work. What's wrong?
     AA: Most likely `file://`: the page starts a Worker from a file URL, and browsers refuse that (README.md, lines 62-63). ASSUMED: I cannot run a browser here.
     On the Mac: `cd <repo> && python3 -m http.server 8000`, then open `http://localhost:8000/` (the sources) or `http://localhost:8000/dist/` (the single file, after `nu build-single.nu`).
 
-??? If it still fails on localhost, what do you see: the sign-in does nothing, an error under the form, or "Mask" missing from Type?
-    Default: open the browser console (Safari: Develop → Show JavaScript Console) and paste its red lines here.
+
+But *the* previous page-served.html works.
+
+    AA: It is a single-file build: the worker is inlined as a blob, so `file://` is enough. The root `index.html` loads the worker from separate files, and that fails from `file://`.
+    Open `dist/index.html` instead: the same single-file build, with the mask in it (built at 16:05 today by `nu build-single.nu`; `page-served.html` has no mask code).
