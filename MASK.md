@@ -21,6 +21,7 @@ There is no check value: a wrong secret, site or counter, or a typo in the maske
 One site and counter must mask one text only.
 Two texts masked under the same site and counter leak the difference between them, character by character.
 The length of the text, and every character that is not an ASCII letter or digit, stay visible.
+Each letter or digit also keeps its class (digit, lower case, upper case): in a masked hex code, the paper shows which positions are digits and which are `a`-`f`.
 Write the site and the counter next to the masked text: they are not secret, and unmask needs them.
 
 ## Derivation
