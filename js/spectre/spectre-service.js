@@ -20,7 +20,7 @@
  * It attaches the following properties to the global `spectre` object:
  * `userName`, `identicon`, `authenticated` & `site`: They describe the current state of the Spectre identity managed through the service.
  * It attaches the following functions to the global `spectre` object:
- * `invalidate`, `authenticate`, `password`, `login` & `answer`: They operate on the Spectre identity managed through the service.
+ * `invalidate`, `authenticate`, `password`, `login`, `answer` & `mask`: They operate on the Spectre identity managed through the service.
  */
 
 spectre.observers = [];
@@ -38,6 +38,13 @@ spectre.operations = {
         error: null,
         cause: null,
         result: [],
+    },
+    mask: {
+        pending: false,
+        error: null,
+        cause: null,
+        request: null,
+        result: null,
     }
 };
 
@@ -89,6 +96,28 @@ spectre.request = Object.freeze((siteName, resultType, keyCounter, keyPurpose, k
         "keyPurpose": keyPurpose,
         "keyContext": keyContext,
     });
+});
+spectre.mask = Object.freeze((siteName, keyCounter, maskText, unmask) => {
+    spectre.operations.mask.pending = true;
+    spectre.operations.mask.request = {siteName, keyCounter, maskText, unmask: !!unmask};
+    for (const observer of spectre.observers) {
+        observer()
+    }
+
+    spectre.worker.postMessage({
+        "userName": spectre.operations.user.userName,
+        ...spectre.operations.mask.request,
+    });
+});
+// Only the last request is kept. Why: the text may be a plain recovery code,
+// and a cache would keep every code typed this session in memory.
+function sameMaskRequest(a, b) {
+    return !!a && !!b && a.siteName === b.siteName && String(a.keyCounter) === String(b.keyCounter)
+        && a.maskText === b.maskText && a.unmask === b.unmask;
+}
+spectre.maskResult = Object.freeze((siteName, keyCounter, maskText, unmask) => {
+    let mask = spectre.operations.mask;
+    return sameMaskRequest(mask.request, {siteName, keyCounter, maskText, unmask: !!unmask}) && !mask.pending ? mask.result : undefined;
 });
 // Keyed by every input of the derivation. Why: keyed by site alone, a switch
 // of type or counter showed the previous result until the worker answered,
@@ -146,6 +175,11 @@ spectre.worker.onmessage = (msg) => {
             spectre.operations.site.error = null;
             spectre.operations.site.cause = null;
             spectre.operations.site.result = [];
+            spectre.operations.mask.pending = false;
+            spectre.operations.mask.error = null;
+            spectre.operations.mask.cause = null;
+            spectre.operations.mask.request = null;
+            spectre.operations.mask.result = null;
             break;
         case 'identicon':
             spectre.operations.user.identicon = msg.data.userIdenticon;
@@ -171,6 +205,15 @@ spectre.worker.onmessage = (msg) => {
                     }
                 }
             });
+            break;
+        case 'mask':
+            // An answer to an older request is dropped: the user typed on.
+            if (!sameMaskRequest(spectre.operations.mask.request, msg.data))
+                return;
+            spectre.operations.mask.pending = false;
+            spectre.operations.mask.error = msg.data.error;
+            spectre.operations.mask.cause = msg.data.cause;
+            spectre.operations.mask.result = msg.data.maskResult;
             break;
     }
     

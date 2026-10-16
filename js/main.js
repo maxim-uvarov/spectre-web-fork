@@ -11,6 +11,10 @@ const siteType = document.getElementById("siteType");
 const siteResult = document.getElementById("siteResult");
 const siteError = document.getElementById("siteError");
 const seedNotice = document.getElementById("seedNotice");
+const maskFields = document.getElementById("maskFields");
+const maskText = document.getElementById("maskText");
+const maskNotice = document.getElementById("maskNotice");
+const purposeFields = document.getElementById("purposeFields");
 const copyButton = document.getElementById("copy");
 const signOutButton = document.getElementById("signout");
 
@@ -21,9 +25,18 @@ for (const template in spectre.templates) {
     siteType.add(new Option(spectre.resultName[template], template));
 }
 siteType.add(new Option(spectre.resultName[spectre.resultType.deriveMnemonic], spectre.resultType.deriveMnemonic));
+siteType.add(new Option(spectre.resultName[spectre.resultType.stateMask], spectre.resultType.stateMask));
 
 function purpose() {
     return siteForm.elements.sitePurpose.value;
+}
+
+function masking() {
+    return siteType.value == spectre.resultType.stateMask;
+}
+
+function unmask() {
+    return siteForm.elements.maskDirection.value === "unmask";
 }
 
 // Only the type follows the purpose. Not the counter because: a user who set
@@ -47,11 +60,25 @@ function updateType() {
 // fraction, so an invalid entry used to show a derived result that the Copy
 // button then refused; now nothing is derived until the field validates.
 function updateSpectre() {
-    if (siteCounter.validity.valid) {
-        spectre.request(siteName.value, siteType.value, siteCounter.value, purpose(), null);
-    } else {
+    if (!siteCounter.validity.valid) {
         updateView();
+    } else if (masking()) {
+        spectre.mask(siteName.value, siteCounter.value, maskText.value, unmask());
+    } else {
+        spectre.request(siteName.value, siteType.value, siteCounter.value, purpose(), null);
     }
+}
+
+function siteResultText() {
+    if (masking()) {
+        const mask = spectre.operations.mask;
+        return spectre.maskResult(siteName.value, siteCounter.value, maskText.value, unmask()) || (mask.pending ? "…" : "");
+    }
+    return spectre.result(siteName.value, purpose(), null, siteType.value, siteCounter.value) || (spectre.operations.site.pending ? "…" : "");
+}
+
+function siteErrorText() {
+    return (masking() ? spectre.operations.mask.error : spectre.operations.site.error) || "";
 }
 
 // The identicon is the check that the secret was typed right: it is derived
@@ -62,20 +89,25 @@ function identicon(icon) {
 
 function updateView() {
     const user = spectre.operations.user;
-    const site = spectre.operations.site;
     const signedIn = user.authenticated;
 
     userForm.hidden = signedIn;
     siteForm.hidden = !signedIn;
     userError.textContent = user.error || "";
-    siteError.textContent = site.error || "";
+    siteError.textContent = siteErrorText();
     userSecret.value = "";
 
     if (signedIn) {
         identity.textContent = `${user.userName} ${identicon(user.identicon)}`;
         seedNotice.hidden = siteType.value != spectre.resultType.deriveMnemonic;
+        maskFields.hidden = !masking();
+        // Why: a purpose button switches the type to a password type, which
+        // would leave Mask with the plain code in the hidden field; the
+        // purpose has no effect on the mask anyway.
+        purposeFields.hidden = masking();
+        maskNotice.hidden = !masking();
         if (siteCounter.validity.valid) {
-            siteResult.value = spectre.result(siteName.value, purpose(), null, siteType.value, siteCounter.value) || (site.pending ? "…" : "");
+            siteResult.value = siteResultText();
         } else {
             siteError.textContent = siteCounter.validationMessage;
             siteResult.value = "";
@@ -83,6 +115,7 @@ function updateView() {
     } else {
         userName.value = user.userName || "";
         siteName.value = "";
+        maskText.value = "";
         siteResult.value = "";
     }
 }
@@ -109,10 +142,20 @@ signOutButton.addEventListener("click", () => {
 });
 // Why: the iOS app switcher keeps a snapshot of the last frame, and a seed
 // phrase must not sit in it. The result comes back from the cache on return.
+// The mask text is held aside the same way: masking, it is the plain code.
+let hiddenMaskText = null;
 document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
         siteResult.value = "";
-    } else if (spectre.operations.user.authenticated) {
+        hiddenMaskText = maskText.value;
+        maskText.value = "";
+        return;
+    }
+    if (hiddenMaskText !== null) {
+        maskText.value = hiddenMaskText;
+        hiddenMaskText = null;
+    }
+    if (spectre.operations.user.authenticated) {
         // Not an unconditional updateView because: signed out, it resets the
         // sign-in fields, and a screen lock mid-typing would erase the secret.
         updateView();
@@ -121,6 +164,8 @@ document.addEventListener("visibilitychange", () => {
 siteName.addEventListener("input", updateSpectre);
 siteCounter.addEventListener("input", updateSpectre);
 siteType.addEventListener("input", updateSpectre);
+maskText.addEventListener("input", updateSpectre);
+siteForm.elements.maskDirection.forEach((radio) => radio.addEventListener("input", updateSpectre));
 siteForm.elements.sitePurpose.forEach((radio) => radio.addEventListener("input", () => {
     updateType();
     updateSpectre();

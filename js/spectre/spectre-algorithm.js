@@ -19,7 +19,7 @@
  * It provides a SpectreUser class which can be used to instantiate and interact with a single long-lived Spectre user identity.
  * 
  * It attaches the following functions to the global `spectre` object:
- * `newUserKey`, `newSiteKey`, `newSiteResult` & `newIdenticon`: They are used to perform stateless Spectre algorithm operations.
+ * `newUserKey`, `newSiteKey`, `newSiteResult`, `newMask` & `newIdenticon`: They are used to perform stateless Spectre algorithm operations.
  */
 
 importScripts(new URL("js/spectre/spectre-types.js", baseURI).href);
@@ -64,6 +64,11 @@ class SpectreUser {
     async result(siteName, resultType, keyCounter, keyPurpose, keyContext) {
         let userKey = await this.userKeyPromise
         return spectre.newSiteResult(userKey, siteName, resultType, keyCounter, keyPurpose, keyContext);
+    }
+
+    async mask(siteName, keyCounter, text, unmask) {
+        let userKey = await this.userKeyPromise
+        return spectre.newMask(userKey, siteName, keyCounter, text, unmask);
     }
 
     invalidate() {
@@ -229,6 +234,60 @@ spectre.newSiteResult = Object.freeze(async(userKey, siteName,
     return resultTemplate.split("").map((characterClass, rT) => {
         let characters = spectre.characters[characterClass];
         return characters[siteKeyBytes[rT + 1] % characters.length];
+    }).join("");
+});
+
+// Each letter, digit or symbol moves inside its own alphabet by a key value;
+// a separator (dash, space, line break) or a non-ASCII character stays, so the masked text keeps the length and the shape of
+// the code it hides. Unmask moves it back.
+// Why: the user stores recovery codes on paper and wanted the masked text no
+// longer than the code; a wrong secret, site or counter giving plausible
+// garbage instead of an error was accepted for that.
+// Not AES ("Own" in upstream Spectre) because: it is two to three times longer
+// on paper, and no other Spectre client has to read these texts.
+// One site and counter must mask one text only: two texts under the same key
+// leak the difference between them.
+// Only alphabet characters take a key position. Why: a code copied back from
+// paper with a lost space, dash or blank line would otherwise shift every
+// later key value and unmask the rest as garbage, with no error.
+// Symbols are masked too. Why: a password such as pg^VMAUBk5x3p%HP%i4= would
+// otherwise keep ^ % = readable on paper. The dash is left out of them: it is
+// the usual separator of recovery codes.
+// Frozen: once a masked code is on paper, any change here loses it. MASK.md.
+const MASK_ALPHABETS = ["0123456789", "abcdefghijklmnopqrstuvwxyz", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "!\"#$%&'()*+,./:;<=>?@[\\]^_`{|}~"];
+spectre.newMask = Object.freeze(async(userKey, siteName, keyCounter = spectre.counter.default, text = "", unmask = false) => {
+    console.trace(`[spectre]: mask: ${siteName} (keyCounter=${keyCounter}, unmask=${unmask})`);
+
+    let maskKey = await spectre.newSiteKey(userKey, siteName, keyCounter, spectre.purpose.mask, null)
+    let streamKey = await crypto.subtle.importKey("raw", maskKey.keyData, {
+        name: "HMAC", hash: {name: "SHA-256"}
+    }, false, ["sign"])
+
+    // Code points, not UTF-16 units: an emoji is one character, not two.
+    let characters = Array.from(text);
+    let alphabets = characters.map(character => MASK_ALPHABETS.find(alphabet => alphabet.includes(character)));
+    let positions = alphabets.filter(alphabet => alphabet).length;
+
+    // Key stream: HMAC-SHA-256(mask key, uint32be(block)), 32 bytes per block,
+    // one big-endian uint16 per alphabet character. 16 bits keep the modulo bias
+    // under 2^-11 for every alphabet.
+    let stream = new Uint8Array(Math.ceil(positions * 2 / 32) * 32);
+    for (let block = 0; block * 32 < stream.length; block++) {
+        let index = new Uint8Array(4);
+        new DataView(index.buffer).setUint32(0, block, false/*big-endian*/);
+        stream.set(new Uint8Array(await crypto.subtle.sign("HMAC", streamKey, index)), block * 32);
+    }
+    let streamView = new DataView(stream.buffer);
+
+    let p = 0;
+    return characters.map((character, c) => {
+        let alphabet = alphabets[c];
+        if (!alphabet) {
+            return character;
+        }
+        let shift = streamView.getUint16(p++ * 2, false/*big-endian*/) % alphabet.length;
+        let position = alphabet.indexOf(character) + (unmask ? alphabet.length - shift : shift);
+        return alphabet[position % alphabet.length];
     }).join("");
 });
 

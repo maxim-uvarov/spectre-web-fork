@@ -137,6 +137,37 @@ onmessage = (msg) => {
         )
     }
 
+    // A mask request carries maskText; it is answered as its own operation, so
+    // the masked text never enters the site result cache.
+    if (msg.data.maskText !== undefined && (!msg.data.userName || spectre.user.userName === msg.data.userName)) {
+        let request = {
+            siteName: msg.data.siteName,
+            keyCounter: msg.data.keyCounter || spectre.counter.default,
+            maskText: msg.data.maskText,
+            unmask: !!msg.data.unmask,
+        }
+        spectre.user.mask(request.siteName, request.keyCounter, request.maskText, request.unmask).then(
+            maskResult =>
+                postMessage({
+                    ...request,
+                    "operation": "mask",
+                    "userName": spectre.user && spectre.user.userName,
+                    "maskResult": maskResult,
+                }),
+            error => {
+                console.error(`[spectre]: ${error}`);
+                postMessage({
+                    ...request,
+                    "operation": "mask",
+                    "userName": spectre.user.userName,
+                    "error": error.message,
+                    "cause": error.cause,
+                })
+            }
+        );
+        return
+    }
+
     // A site request is any message that carries a siteName, empty included.
     // Why: an empty name used to be dropped here without a reply, so the page
     // stayed "pending" and showed "…" until the next derivation answered. Now
