@@ -84,3 +84,11 @@ Did *the* advisor recheck?
     AA: Not before your question: one review after `b451660`, none after the follow-ups. It ran now, and two findings are fixed.
     `fad17cf`: only letters and digits take a key value, so a lost dash, space or line break no longer spoils the rest of a code (new vectors).
     `58393cd`: the result shows a set of codes one per line.
+
+*Why* did we choose not to mask symbols?
+
+    AA: It was my choice, in the first same-length proposal: separators (`-`, space, line break) stay, so the paper keeps the shape of the code, and since `fad17cf` a lost dash spoils nothing.
+    Other symbols followed only because "symbol" has no clear alphabet. Recovery codes rarely hold them, but a password does (`pg^VMAUBk5x3p%HP%i4=`): its `^ % =` stay readable on paper.
+
+??? Add a fourth alphabet: the ASCII symbols `` !"#$%&'()*+,./:;<=>?@[\]^_`{|}~ ``, keeping only `-`, space and line breaks as separators?
+    Default: yes, now, while nothing is on paper. Cost: a `/` or `.` inside a code is masked too, so it is no longer a free separator.
