@@ -7,12 +7,12 @@ session: 13606f3d-51b6-499c-8482-13aa92799c80
 
 # mask-unmask-secrets
 
-I want a simple mechanic for storing recovery codes encrypted by spectre on offline mediums.
+I want a simple *mechanism* for storing recovery codes encrypted by *Spectre* on offline *media*.
 
-So I enter some string into our pwa (with filled spectre credentials),
-and it should output the string,
-that I can store on insecure mediums,
-to be recovered later with the same pwa.
+So I enter some string into our *PWA* (with *the Spectre credentials filled in*),
+and it should output *a* string
+that I can store on insecure *media*,
+to be recovered later with the same *PWA*.
 
     AA: Feasible inside the worker, with no new library; design and its cost in `todo/20261016-mask-unmask-secrets-design.md`.
     The format is frozen from the first masked code on paper, like the seed words.
@@ -22,21 +22,21 @@ to be recovered later with the same pwa.
 
 ??? Format: upstream "Own" (AES-CBC, readable by official Spectre apps, but a typo or wrong secret can give silent garbage — ASSUMED, source not reachable) or fork-local AES-GCM (an error instead of garbage)?
     Default: fork-local AES-GCM. Cost: only this fork can unmask.
-        !! let's go with spectre defaults without additional lib. I mean if it outputs garbage - that's ok.
+        !! let's go with *Spectre* defaults without *an* additional *library*. I mean*,* if it outputs garbage*,* that's ok.
 
 ??? Output: Crockford Base32 in groups of 4 (hand-copy safe, about 20% longer than Base64)?
     Default: yes. Cost: a 20-character code becomes about 90 characters on paper.
         !! hm, can't we use the same set of standard symbols?
-        or it will harm the security?
+        or *will it* harm security?
 
             AA: No alphabet changes security: it only writes the same bytes another way. The choice is length vs. copy errors.
             A 20-character code is 48 bytes after masking: Base64 = 64 characters, Base32 = 77, BIP-39 words = 35 words.
 
-                ?? and we can't invent anything elegant that will keep the same length?
-                Initially I thought that if we have a strong trusted seed (right word?) from spectre,
+                ?? and can't we invent anything elegant that *keeps* the same length?
+                Initially I thought that if we have a strong trusted seed (right word?) from *Spectre*,
                 we can apply a very basic transformation,
-                that without knowing our seed will make it difficult to recover the result.
-                But you are saying that the number of chars is going to be bigger anyway.
+                *which*, without our seed, *makes* it difficult to recover the result.
+                But you are saying that the number of *characters* is going to be bigger anyway.
 
                     AA: Yes, we can — and it is how Spectre itself builds passwords: site-key bytes pick each character.
                     Each character moves forward in its own alphabet by a key value: `out[i] = abc[(pos(in[i]) + k[i]) mod len(abc)]`, k from HMAC(site key). Same length, same alphabet, `-` stays in place, no library.
@@ -72,7 +72,7 @@ to be recovered later with the same pwa.
 ??? `main` tracks `origin/main`, the upstream GitLab Spectre: it is your mirror of upstream, not your trunk.
     Default: keep `main` as the mirror, and set `pwa-homescreen` as the default branch of the GitHub fork (Settings → Branches). Nothing local is deleted.
     Cost: the land-branch flow needs a trunk name other than `main`, so `pwa-homescreen` becomes that trunk.
-        !! pwa-homescreen is already default on github.
+        !! pwa-homescreen is already *the* default on *GitHub*.
 
             AA: Settled: `main` stays the upstream mirror, untouched; `pwa-homescreen` is the trunk.
             All questions are answered. First step on `go`: pull `source/pwa-homescreen`, branch `mask-secrets`, write the contract doc and the test vector, before any UI.
