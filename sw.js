@@ -2,7 +2,20 @@
 // Why: the page describes itself as an offline password cipher, and a home screen
 // install is only worth having if it opens without a network.
 
-const CACHE = "spectre-web-v2";
+// build-single.nu replaces this line with the hash of the page it builds.
+const VERSION = "v2";
+
+// Why the scope in the name: every app on a github.io host shares one origin,
+// and so one set of caches. The activate step used to delete every cache but
+// this one, which wiped the offline copy of any other app on the host; the
+// air-gapped signer there, whose worker has no network fallback, then failed
+// to load at all, online too, until its next version installed. A cache now
+// belongs to the scope it was made for, and only this scope's older versions
+// are deleted. Caches named the old way ("spectre-web-v2",
+// "spectre-web-single-...") are left alone: from the name alone they cannot be
+// told apart from another deployment's.
+const PREFIX = "spectre-web:" + self.registration.scope + ":";
+const CACHE = PREFIX + VERSION;
 
 // Everything index.html loads from this origin, plus the worker chain.
 const PRECACHE = [
@@ -32,7 +45,9 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
     event.waitUntil(
         caches.keys()
-              .then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key))))
+              .then(keys => Promise.all(keys
+                  .filter(key => key.startsWith(PREFIX) && key !== CACHE)
+                  .map(key => caches.delete(key))))
               .then(() => self.clients.claim()));
 });
 
@@ -62,5 +77,9 @@ self.addEventListener("fetch", event => {
     // that is expected, so the kept copy swallows it; the copy handed to
     // respondWith on a cache miss still rejects, which is the real error.
     event.waitUntil(refresh.catch(() => {}));
-    event.respondWith(caches.match(event.request).then(cached => cached || refresh));
+    // Looked up in this version's cache only, not in every cache of the origin,
+    // where another app's entry for the same URL could answer.
+    event.respondWith(caches.open(CACHE)
+        .then(cache => cache.match(event.request))
+        .then(cached => cached || refresh));
 });

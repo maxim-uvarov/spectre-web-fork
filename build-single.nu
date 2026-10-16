@@ -107,6 +107,16 @@ def check-seed-words []: nothing -> nothing {
     print $result.stdout
 }
 
+# Why: a worker that deletes another app's cache breaks that app on the same
+# host, and the published page shares its host with the air-gapped signer.
+def check-sw-caches []: nothing -> nothing {
+    let result = node (source-path test/sw-caches.mjs) | complete
+    if $result.exit_code != 0 {
+        error make {msg: $"service worker cache test failed:\n($result.stderr)"}
+    }
+    print $result.stdout
+}
+
 def worker-source []: nothing -> string {
     $WORKER_CHAIN
     | each {|file| read-text $file | lines | where $it !~ '^importScripts\(' | str join "\n" }
@@ -170,22 +180,23 @@ def build-html []: nothing -> string {
     | hashed-csp
 }
 
-# The cache name carries the hash of index.html, so a new build changes sw.js
+# The cache version is the hash of index.html, so a new build changes sw.js
 # and the browser replaces the old cache on its own, on the first load rather
 # than the second that the background refresh in sw.js would take.
 def build-sw [html: string]: nothing -> string {
     let build = $html | hash sha256 | str substring 0..15
     read-text sw.js
-    | must-replace --regex 'const CACHE = "[^"]*";' $'const CACHE = "spectre-web-single-($build)";'
+    | must-replace --regex 'const VERSION = "[^"]*";' $'const VERSION = "single-($build)";'
     | must-replace --regex '(?s)const PRECACHE = \[.*?\];' 'const PRECACHE = ["./", "index.html", "sw.js"];'
 }
 
-# --skip-tests leaves out the node test only; the word list hash check is pure
+# --skip-tests leaves out the node tests only; the word list hash check is pure
 # Nushell and stays.
 def main [--skip-tests]: nothing -> nothing {
     check-bip39-list
     if not $skip_tests {
         check-seed-words
+        check-sw-caches
     }
     let out = source-path dist
     mkdir $out
