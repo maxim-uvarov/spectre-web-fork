@@ -101,6 +101,15 @@ fieldset label:has(:checked) {
     color: white;
 }
 
+#maskFields {
+    display: grid;
+    gap: 0.75rem;
+}
+
+#maskText {
+    font-family: ui-monospace, monospace;
+}
+
 #identity {
     margin: 0;
 }

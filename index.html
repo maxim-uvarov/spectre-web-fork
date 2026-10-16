@@ -55,8 +55,18 @@
                         <select id="siteType"></select>
                     </label>
                 </div>
+                <div id="maskFields" hidden>
+                    <label>Text
+                        <input id="maskText" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
+                    </label>
+                    <fieldset>
+                        <label><input type="radio" name="maskDirection" value="mask" checked>Mask</label>
+                        <label><input type="radio" name="maskDirection" value="unmask">Unmask</label>
+                    </fieldset>
+                </div>
                 <output id="siteResult" translate="no"></output>
                 <p id="seedNotice" class="notice" hidden>A wallet seed cannot be changed later. It follows from the name, secret, algorithm version, site and counter, so the secret must be long and random. See SEED-WORDS.md.</p>
+                <p id="maskNotice" class="notice" hidden>The masked text keeps the length of the original and has no check: a wrong secret, site or counter gives a wrong text, not an error. Mask one text per site and counter, and write them next to it. See MASK.md.</p>
                 <p id="siteError" class="error"></p>
                 <button type="submit" id="copy">Copy</button>
                 <button type="button" id="signout">Sign out</button>
