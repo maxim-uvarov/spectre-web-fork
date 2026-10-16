@@ -106,3 +106,8 @@ But *the* previous page-served.html works.
 
     AA: It is a single-file build: the worker is inlined as a blob, so `file://` is enough. The root `index.html` loads the worker from separate files, and that fails from `file://`.
     Open `dist/index.html` instead: the same single-file build, with the mask in it (built at 16:05 today by `nu build-single.nu`; `page-served.html` has no mask code).
+
+*Can* you rebuild it? *Or delete it,* to not mislead.
+
+    AA: Deleted from the repo: `page-served.html` was an untracked copy of the published page from Sep 11, with no mask code. A rebuild under that name would mislead too, because it would not be what the host serves.
+    `dist/index.html` is the current build: `nu build-single.nu` remakes it. Until this session ends, the old file is still at `/tmp/claude-1000/-Users-user-git-ai-sandbox-dev-container-upstream-big-repos-spectre-web/13606f3d-51b6-499c-8482-13aa92799c80/scratchpad/page-served.html`.
