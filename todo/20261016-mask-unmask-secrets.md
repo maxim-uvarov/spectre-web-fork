@@ -14,7 +14,8 @@ and it should output *a* string
 that I can store on insecure *media*,
 to be recovered later with the same *PWA*.
 
-    AA: Built on `feature/mask-unmask`: `6e7e8e1` algorithm + MASK.md + test, `b451660` UI, `0fb54dc` and `febe8c0` follow-ups; `a54e1eb` merged the 2 commits from your fork.
+    AA: Built on `feature/mask-unmask`: `6e7e8e1` algorithm + MASK.md + test, `b451660` UI, `0fb54dc`, `febe8c0`, `fad17cf`, `58393cd` follow-ups; `a54e1eb` merged the 2 commits from your fork.
+    Do not mask a real code before you check the app: the first one on paper freezes the format.
     The page itself never ran here (no browser): ASSUMED until you check. How to check, the checklist and the Not requested list: `todo/20261016-mask-unmask-secrets-design.md`.
         %% I didn't read the design to save my resources. Let me know if it is necessary.
 
@@ -77,3 +78,9 @@ to be recovered later with the same *PWA*.
             AA: Settled: `main` stays the upstream mirror, untouched; `pwa-homescreen` is the trunk.
             All questions are answered. First step on `go`: pull `source/pwa-homescreen`, branch `mask-secrets`, write the contract doc and the test vector, before any UI.
             Please commit this canvas before `go`: an uncommitted file is what your editor overwrote last time.
+
+Did *the* advisor recheck?
+
+    AA: Not before your question: one review after `b451660`, none after the follow-ups. It ran now, and two findings are fixed.
+    `fad17cf`: only letters and digits take a key value, so a lost dash, space or line break no longer spoils the rest of a code (new vectors).
+    `58393cd`: the result shows a set of codes one per line.

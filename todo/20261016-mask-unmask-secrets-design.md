@@ -12,7 +12,7 @@ Upstream Spectre apps store "Own" passwords as AES-128-CBC under the site key, z
 - Key: HMAC-SHA-256(user-key, own purpose string . site . counter), like the seed words, so it shares no bytes with any password of that site.
 - Mask: each character moves forward in its own alphabet (digits, lower case, upper case) by a key value: `out[i] = abc[(pos(in[i]) + k[i]) mod len(abc)]`.
   Unmask moves it back. Characters outside these alphabets (`-`, space) stay in place, so the output has the same length and shape as the input.
-- k[i] comes from the HMAC output (extended with a block counter when the code is longer than 32 bytes); a 16-bit value per character keeps the mod bias negligible.
+- MASK.md is the contract for the details: only letters and digits take a 16-bit key value; separators are copied and take none.
 - No authentication: a wrong secret, site or counter gives a plausible code of the same shape. The user accepted that.
 - One site + counter masks one code. Two codes under the same key leak the difference between them, character by character.
 - All crypto runs in `spectre-worker.js`; the user key never reaches `main.js`.
@@ -39,7 +39,8 @@ Plain http from another device does not work: `crypto.subtle` exists only on htt
 Checklist (the page wiring is not tested; the worker and the service are):
 
 - Type → Mask shows the Text field, the Mask/Unmask switch and the notice.
-- The result has the same length and shape as the text; `-`, spaces and line breaks stay.
+- The result has the same length and shape as the text; `-`, spaces and line breaks stay, one code per line.
+- Unmask a code with its dashes removed: it still gives the code.
 - Unmask on the result gives the original back.
 - Switch the type away and back: the result is right, never a stale one.
 - Switch apps and return: the text and the result come back.
