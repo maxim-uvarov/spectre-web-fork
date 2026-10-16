@@ -1,5 +1,5 @@
 ---
-status: draft #draft | in_progress | completed | rejected
+status: in_progress #draft | in_progress | completed | rejected
 agents-mode: co-editing #read-only | grammar-fixes | co-editing
 updated: '20261016' #yyyyMMdd
 session: 13606f3d-51b6-499c-8482-13aa92799c80
@@ -14,8 +14,8 @@ and it should output *a* string
 that I can store on insecure *media*,
 to be recovered later with the same *PWA*.
 
-    AA: Feasible inside the worker, with no new library; design and its cost in `todo/20261016-mask-unmask-secrets-design.md`.
-    The format is frozen from the first masked code on paper, like the seed words.
+    AA: Built on `feature/mask-unmask`: `6e7e8e1` algorithm + MASK.md + test, `b451660` UI, `0fb54dc` and `febe8c0` follow-ups; `a54e1eb` merged the 2 commits from your fork.
+    The page itself never ran here (no browser): ASSUMED until you check. How to check, the checklist and the Not requested list: `todo/20261016-mask-unmask-secrets-design.md`.
         %% I didn't read the design to save my resources. Let me know if it is necessary.
 
             AA: Not necessary. The one point you must know is in the Readback below: the paper is only as strong as your Spectre secret.
