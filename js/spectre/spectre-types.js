@@ -48,6 +48,8 @@ spectre.purpose = Object.freeze({
     recovery: "com.lyndir.masterpassword.answer",
     /** Generate a wallet seed. Fork-local, and frozen for good: see SEED-WORDS.md. */
     seed: "com.lyndir.masterpassword.seed",
+    /** Mask a text for storage on paper. Fork-local, and frozen for good: see MASK.md. */
+    mask: "com.lyndir.masterpassword.mask",
 });
 spectre.class = Object.freeze({
     /** Use the site key to generate a result from a template. */
@@ -97,6 +99,9 @@ spectre.resultType = {
 
     /** 4161: Derive a 24-word BIP-39 mnemonic. Fork-local: no other Spectre client knows this value. */
     deriveMnemonic: 0x1 | spectre.class.derive | spectre.feature.alternate,
+
+    /** 4130: Mask or unmask a text the user types. Fork-local: no other Spectre client knows this value. */
+    stateMask: 0x2 | spectre.class.stateful | spectre.feature.alternate,
 };
 spectre.resultType = Object.freeze({
     ...spectre.resultType,
@@ -117,6 +122,7 @@ spectre.resultName = Object.freeze({
     [spectre.resultType.stateDevice]: "Device",
     [spectre.resultType.deriveKey]: "Key",
     [spectre.resultType.deriveMnemonic]: "Seed words",
+    [spectre.resultType.stateMask]: "Mask",
 });
 spectre.counter = {
     /** Use a time-based counter value, resulting in a TOTP generator. */

@@ -107,6 +107,16 @@ def check-seed-words []: nothing -> nothing {
     print $result.stdout
 }
 
+# Why: the mask is a contract too, see MASK.md. A moved vector is a recovery
+# code on paper that no longer unmasks.
+def check-mask []: nothing -> nothing {
+    let result = node (source-path test/mask.mjs) | complete
+    if $result.exit_code != 0 {
+        error make {msg: $"mask test failed:\n($result.stderr)"}
+    }
+    print $result.stdout
+}
+
 # Why: a worker that deletes another app's cache breaks that app on the same
 # host, and the published page shares its host with the air-gapped signer.
 def check-sw-caches []: nothing -> nothing {
@@ -196,6 +206,7 @@ def main [--skip-tests]: nothing -> nothing {
     check-bip39-list
     if not $skip_tests {
         check-seed-words
+        check-mask
         check-sw-caches
     }
     let out = source-path dist
