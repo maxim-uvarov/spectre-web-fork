@@ -92,3 +92,4 @@ Did *the* advisor recheck?
 
 ??? Add a fourth alphabet: the ASCII symbols `` !"#$%&'()*+,./:;<=>?@[\]^_`{|}~ ``, keeping only `-`, space and line breaks as separators?
     Default: yes, now, while nothing is on paper. Cost: a `/` or `.` inside a code is masked too, so it is no longer a free separator.
+        !! yes, let's mask them too
