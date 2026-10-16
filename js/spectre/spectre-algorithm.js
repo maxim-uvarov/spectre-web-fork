@@ -247,6 +247,9 @@ spectre.newSiteResult = Object.freeze(async(userKey, siteName,
 // on paper, and no other Spectre client has to read these texts.
 // One site and counter must mask one text only: two texts under the same key
 // leak the difference between them.
+// Only letters and digits take a key position. Why: a code copied back from
+// paper with a lost space, dash or blank line would otherwise shift every
+// later key value and unmask the rest as garbage, with no error.
 // Frozen: once a masked code is on paper, any change here loses it. MASK.md.
 const MASK_ALPHABETS = ["0123456789", "abcdefghijklmnopqrstuvwxyz", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"];
 spectre.newMask = Object.freeze(async(userKey, siteName, keyCounter = spectre.counter.default, text = "", unmask = false) => {
@@ -257,13 +260,15 @@ spectre.newMask = Object.freeze(async(userKey, siteName, keyCounter = spectre.co
         name: "HMAC", hash: {name: "SHA-256"}
     }, false, ["sign"])
 
-    // Code points, not UTF-16 units: an emoji is one position, not two.
+    // Code points, not UTF-16 units: an emoji is one character, not two.
     let characters = Array.from(text);
+    let alphabets = characters.map(character => MASK_ALPHABETS.find(alphabet => alphabet.includes(character)));
+    let positions = alphabets.filter(alphabet => alphabet).length;
 
     // Key stream: HMAC-SHA-256(mask key, uint32be(block)), 32 bytes per block,
-    // one big-endian uint16 per character position. 16 bits keep the modulo
-    // bias under 2^-11 for every alphabet.
-    let stream = new Uint8Array(Math.ceil(characters.length * 2 / 32) * 32);
+    // one big-endian uint16 per letter or digit. 16 bits keep the modulo bias
+    // under 2^-11 for every alphabet.
+    let stream = new Uint8Array(Math.ceil(positions * 2 / 32) * 32);
     for (let block = 0; block * 32 < stream.length; block++) {
         let index = new Uint8Array(4);
         new DataView(index.buffer).setUint32(0, block, false/*big-endian*/);
@@ -271,12 +276,13 @@ spectre.newMask = Object.freeze(async(userKey, siteName, keyCounter = spectre.co
     }
     let streamView = new DataView(stream.buffer);
 
+    let p = 0;
     return characters.map((character, c) => {
-        let alphabet = MASK_ALPHABETS.find(alphabet => alphabet.includes(character));
+        let alphabet = alphabets[c];
         if (!alphabet) {
             return character;
         }
-        let shift = streamView.getUint16(c * 2, false/*big-endian*/) % alphabet.length;
+        let shift = streamView.getUint16(p++ * 2, false/*big-endian*/) % alphabet.length;
         let position = alphabet.indexOf(character) + (unmask ? alphabet.length - shift : shift);
         return alphabet[position % alphabet.length];
     }).join("");

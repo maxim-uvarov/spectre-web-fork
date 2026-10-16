@@ -25,10 +25,10 @@ vm.runInContext(source + "\n;globalThis.spectre = spectre;", context);
 const { spectre } = context;
 
 const VECTORS = [
-    { site: "github", counter: 1, text: "a1b2c-3d4e5-f6g7h-8i9j0", masked: "a6c9e-2w0w3-v2u6i-3i0z4" },
-    { site: "github", counter: 2, text: "a1b2c-3d4e5-f6g7h-8i9j0", masked: "s7r5i-3r3x7-i8w9x-8f3x4" },
-    { site: "google", counter: 1, text: "ABCD EFGH IJKL MNOP QRST UVWX YZ01 2345 6789", masked: "VNSW IIFO SLHG LDEI NYMX UAII AS51 1773 2550" },
-    { site: "кошелёк", counter: 1, text: "Код: 0042-ffff-ZZZZ 🔑 end", masked: "Код: 4974-stzt-PIHG 🔑 zbh" },
+    { site: "github", counter: 1, text: "a1b2c-3d4e5-f6g7h-8i9j0", masked: "a6c9e-3i1w3-b3w3v-7j2u6" },
+    { site: "github", counter: 2, text: "a1b2c-3d4e5-f6g7h-8i9j0", masked: "s7r5i-2t2l4-v4j9x-0y4b7" },
+    { site: "google", counter: 1, text: "ABCD EFGH IJKL MNOP QRST UVWX YZ01 2345 6789", masked: "VNSW OJJG PAUN JIBO GHLU RCQB FZ55 3302 1738" },
+    { site: "кошелёк", counter: 1, text: "Код: 0042-ffff-ZZZZ 🔑 end", masked: "Код: 0734-xpsm-LXMN 🔑 yba" },
 ];
 
 let checks = 0;
@@ -44,6 +44,10 @@ for (const v of VECTORS) {
     check(`${label} mask`, await spectre.newMask(key, v.site, String(v.counter), v.text, false), v.masked);
     check(`${label} unmask`, await spectre.newMask(key, v.site, v.counter, v.masked, true), v.text);
 }
+// Separators take no key position: a code copied back from paper without its
+// dashes, or with a line break, still unmasks.
+check("dashes dropped", await spectre.newMask(key, "github", 1, "a6c9e3i1w3b3w3v7j2u6", true), "a1b2c3d4e5f6g7h8i9j0");
+check("line break added", await spectre.newMask(key, "github", 1, "a6c9e-3i1w3\nb3w3v-7j2u6", true), "a1b2c-3d4e5\nf6g7h-8i9j0");
 check("empty text", await spectre.newMask(key, "github", 1, "", false), "");
 
 // A wrong secret gives garbage of the same shape, not an error: the user accepted that.

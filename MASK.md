@@ -18,6 +18,7 @@ The purpose radio (Password, Login name, Security answer) has no effect.
 
 The masked text is only as strong as the Spectre secret: whoever has the paper can try secrets offline, at one scrypt per guess.
 There is no check value: a wrong secret, site or counter, or a typo in the masked text, gives a text of the same shape that is wrong, not an error.
+A wrong letter or digit spoils only that character; a lost or extra space, dash or line break spoils nothing, because only letters and digits take a key position.
 One site and counter must mask one text only.
 Two texts masked under the same site and counter leak the difference between them, character by character.
 The length of the text, and every character that is not an ASCII letter or digit, stay visible.
@@ -30,13 +31,12 @@ Write the site and the counter next to the masked text: they are not secret, and
     mask-salt = "com.lyndir.masterpassword.mask" . uint32be(len(site)) . site . uint32be(counter)
     mask-key  = HMAC-SHA-256(user-key, mask-salt)
     stream    = HMAC-SHA-256(mask-key, uint32be(0)) . HMAC-SHA-256(mask-key, uint32be(1)) . ...
-    k[i]      = uint16be(stream[2i], stream[2i+1]) mod len(alphabet of character i)
-    mask:   out[i] = alphabet[(pos(c[i]) + k[i]) mod len(alphabet)]
-    unmask: out[i] = alphabet[(pos(c[i]) - k[i]) mod len(alphabet)]
+    k[j]      = uint16be(stream[2j], stream[2j+1]) mod len(alphabet of the j-th letter or digit)
+    mask:   out = alphabet[(pos(c) + k[j]) mod len(alphabet)]     # c is the j-th letter or digit, j from 0
+    unmask: out = alphabet[(pos(c) - k[j]) mod len(alphabet)]
 
 The alphabets are `0123456789`, `abcdefghijklmnopqrstuvwxyz` and `ABCDEFGHIJKLMNOPQRSTUVWXYZ`.
-A character in none of them is copied unchanged, and still takes its position `i`.
-Positions count Unicode code points, not UTF-16 units: an emoji is one position.
+A character in none of them is copied unchanged and does not advance `j`.
 All strings are UTF-8; `len(site)` follows the version rules of SEED-WORDS.md.
 The reference implementation below is V3 only.
 
@@ -48,7 +48,7 @@ The reference implementation below is V3 only.
     site     = github
     counter  = 1
     text     = a1b2c-3d4e5-f6g7h-8i9j0
-    masked   = a6c9e-2w0w3-v2u6i-3i0z4
+    masked   = a6c9e-3i1w3-b3w3v-7j2u6
 
 More vectors are in `test/mask.mjs`.
 
@@ -66,15 +66,16 @@ def mask(name, secret, site, counter, text, unmask=False):
     user_key = hashlib.scrypt(secret.encode(), salt=user_salt, n=32768, r=8, p=2, dklen=64, maxmem=256 * 1024 * 1024)
     mask_salt = b"com.lyndir.masterpassword.mask" + struct.pack(">I", len(site.encode())) + site.encode() + struct.pack(">I", counter)
     mask_key = hmac.new(user_key, mask_salt, hashlib.sha256).digest()
-    chars = list(text)
-    stream = b"".join(hmac.new(mask_key, struct.pack(">I", b), hashlib.sha256).digest() for b in range((len(chars) * 2 + 31) // 32))
-    out = []
-    for i, ch in enumerate(chars):
+    positions = sum(any(ch in a for a in ALPHABETS) for ch in text)
+    stream = b"".join(hmac.new(mask_key, struct.pack(">I", b), hashlib.sha256).digest() for b in range((positions * 2 + 31) // 32))
+    out, j = [], 0
+    for ch in text:
         abc = next((a for a in ALPHABETS if ch in a), None)
         if abc is None:
             out.append(ch)
             continue
-        k = int.from_bytes(stream[2 * i:2 * i + 2], "big") % len(abc)
+        k = int.from_bytes(stream[2 * j:2 * j + 2], "big") % len(abc)
+        j += 1
         out.append(abc[(abc.index(ch) + (-k if unmask else k)) % len(abc)])
     return "".join(out)
 
