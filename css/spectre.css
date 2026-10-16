@@ -126,6 +126,8 @@ output {
        across lines gets copied to paper as two words. */
     word-break: normal;
     overflow-wrap: anywhere;
+    /* A masked set of codes keeps one code per line. */
+    white-space: pre-wrap;
     user-select: all;
 }
 
