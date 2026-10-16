@@ -49,7 +49,7 @@ Checklist (the page wiring is not tested; the worker and the service are):
 ## Not requested
 
 - Merged the 2 commits of `source/pwa-homescreen` into your branch first (`a54e1eb`).
-- Three alphabets that keep the class: digits, lower case, upper case. A character in none of them is copied.
+- Four alphabets that keep the class: digits, lower case, upper case, ASCII symbols but the dash. A character in none of them is copied.
 - Purpose string `com.lyndir.masterpassword.mask`, Type value 4130, label "Mask". Frozen with the format.
 - The notice under the result, the multi-line text field, and blanking the text while the app is in the background.
 - Test vectors for V3 only; V0-V2 differ only for non-ASCII names and sites, by the rules of SEED-WORDS.md.
