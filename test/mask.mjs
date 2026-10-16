@@ -28,7 +28,8 @@ const VECTORS = [
     { site: "github", counter: 1, text: "a1b2c-3d4e5-f6g7h-8i9j0", masked: "a6c9e-3i1w3-b3w3v-7j2u6" },
     { site: "github", counter: 2, text: "a1b2c-3d4e5-f6g7h-8i9j0", masked: "s7r5i-2t2l4-v4j9x-0y4b7" },
     { site: "google", counter: 1, text: "ABCD EFGH IJKL MNOP QRST UVWX YZ01 2345 6789", masked: "VNSW OJJG PAUN JIBO GHLU RCQB FZ55 3302 1738" },
-    { site: "кошелёк", counter: 1, text: "Код: 0042-ffff-ZZZZ 🔑 end", masked: "Код: 0734-xpsm-LXMN 🔑 yba" },
+    { site: "кошелёк", counter: 1, text: "Код: 0042-ffff-ZZZZ 🔑 end", masked: "Код@ 7966-psmr-XMNT 🔑 skt" },
+    { site: "bank", counter: 1, text: "pg^VMAUBk5x3p%HP%i4=", masked: "sp%QXGYSe2m4a.DX\\w2)" },
 ];
 
 let checks = 0;
